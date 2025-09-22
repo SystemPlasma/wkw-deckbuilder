@@ -981,6 +981,21 @@ export default function App() {
     return (DARK_SLUGS as readonly string[]).every((s) => set.has(s));
   })();
 
+  // Enforce Dark Arts penalty by clearing any [Holy] spells when all three Dark aspects are selected
+  useEffect(() => {
+    if (!allDarkTrioSelected || overrideAll) return;
+    setEntries((prev) => {
+      const next = { ...prev } as Record<string, number>;
+      let changed = false;
+      for (const c of cards) {
+        if (c.type === 'Holy' && (next[c.id] || 0) > 0) {
+          next[c.id] = 0; changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [allDarkTrioSelected, overrideAll, cards]);
+
   function redeem(code: string): { ok: boolean; unlockedName?: string; status?: 'ok' | 'invalid' | 'used' } {
     const input = code.trim();
     const key = input.toUpperCase();
@@ -1196,15 +1211,24 @@ export default function App() {
     return { Holy: holy, Light: light, Dark: dark, Astral: astral, Shadow: shadow };
   }, [entries]);
 
-  // Per-type page limits for non-special spells
-  const TYPE_LIMITS: Partial<Record<SpellType, number>> = { Holy: 4, Light: 24, Dark: 2 };
+  // Per-type page limits for non-special spells (dynamic with Dark Arts penalty)
+  const TYPE_LIMITS = useMemo(() => {
+    // Base limits
+    const base: Partial<Record<SpellType, number>> = { Holy: 4, Light: 24, Dark: 2 };
+    if (!overrideAll && allDarkTrioSelected) {
+      // Penalty: -4 Holy (effectively 0), +3 Light, +1 Dark
+      return { Holy: 0, Light: (base.Light || 0) + 3, Dark: (base.Dark || 0) + 1 } as Partial<Record<SpellType, number>>;
+    }
+    return base;
+  }, [allDarkTrioSelected, overrideAll]);
+
   const remainingByType = useMemo(() => ({
     Holy: Math.max(0, (TYPE_LIMITS.Holy ?? Infinity) - counts.Holy),
     Light: Math.max(0, (TYPE_LIMITS.Light ?? Infinity) - counts.Light),
     Dark: Math.max(0, (TYPE_LIMITS.Dark ?? Infinity) - counts.Dark),
     Astral: Number.POSITIVE_INFINITY,
     Shadow: Number.POSITIVE_INFINITY,
-  } as Record<SpellType, number>), [counts]);
+  } as Record<SpellType, number>), [counts, TYPE_LIMITS]);
 
   // Special unlock flags and helper text
   const hasAstral = unlocksSet.has('starlight');
@@ -1456,7 +1480,7 @@ export default function App() {
                   <>
                     <div className="text-sm font-semibold text-center mb-3">
                       <span className="text-red-700 font-bold" style={{ color: '#dc2626', fontWeight: 700 }}>Dark Arts Penalty:</span>
-                      {' '}When all three Dark Aspects are chosen, [Holy] spells count as [Light] and lose [Holy] counter rules.
+                      {' '}Lose -4 [Holy] spell slots, gain +3 [Light] spell slots, gain +1 [Dark] spell slot.
                     </div>
                     <br />
                   </>
