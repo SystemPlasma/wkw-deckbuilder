@@ -2,11 +2,7 @@ id,name,type,rank,maxCopies,aspect,roles
 c_infinity,Infinity,Holy,1,4,Focus,special
 c_speed,Speed,Light,1,4,Focus,move;movement_increase
 c_enhance,Enhance,Light,1,3,Focus,combat;power_increase
-<<<<<<<< Updated upstream:assets/cards-BZHqojEr.csv
-c_shield,Shield,Light,1,4,Focus,combat;disrupt;counter;disruption
-========
 c_shield,Shield,Light,1,4,Focus,combat;disrupt
->>>>>>>> Stashed changes:assets/cards-DS5AiGPT.csv
 c_counter,Counter,Light,1,4,Focus,disrupt;counter
 c_haste,Haste,Light,1,3,Focus,special
 c_sorcerersgambit,Sorcerer's Gambit,Light,1,2,Focus,draw;search_draw
