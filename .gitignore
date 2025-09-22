@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.vite/
+public/assets/
+.DS_Store
+tsconfig.app.tsbuildinfo
