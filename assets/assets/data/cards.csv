@@ -3,7 +3,7 @@ c_infinity,Infinity,Holy,1,4,Focus,special
 c_speed,Speed,Light,1,4,Focus,move;movement_increase
 c_enhance,Enhance,Light,1,3,Focus,power_increase
 c_shield,Shield,Light,1,4,Focus,disrupt
-c_counter,Counter,Light,1,4,Focus,disrupt;counter
+c_counter,Counter,Light,1,4,Focus,disrupt
 c_haste,Haste,Light,1,3,Focus,special
 c_sorcerersgambit,Sorcerer's Gambit,Light,1,2,Focus,draw;search_draw
 c_arcane_vision,Arcane Vision,Light,1,2,Focus,draw;search_draw
@@ -18,18 +18,18 @@ s_callofancients,Call of Ancients,Dark,2,1,Study,draw;move;search_draw;movement_
 lost_mend,Mend,Light,4,2,Lost,special;draw;search_draw
 legend_excaliburs_blessing,Excalibur's Blessing,Light,3,1,Legend,special;move;power_increase;movement_increase
 legend_manticores_wrath,Manticores' Wrath,Light,3,2,Legend,disrupt;move;movement_increase
-legend_medusas_gaze,Medusa's Gaze,Light,3,2,Legend,disrupt;counter;inflict_status
-legend_sirens_song,Sirens' Song,Light,3,2,Legend,disrupt;counter
+legend_medusas_gaze,Medusa's Gaze,Light,3,2,Legend,disrupt;inflict_status
+legend_sirens_song,Sirens' Song,Light,3,2,Legend,disrupt
 legend_wings_of_icarus,Wings of Icarus,Holy,3,2,Legend,move
-legend_cry_of_the_banshee,Cry of the Banshee,Light,3,2,Legend,disrupt;draw;search_draw;counter
+legend_cry_of_the_banshee,Cry of the Banshee,Light,3,2,Legend,disrupt;draw;search_draw
 prophecy_vision_of_destiny,Vision of Destiny,Light,2,2,Prophecy,draw
-prophecy_written_in_the_stars,Written in the Stars,Light,2,2,Prophecy,draw;counter
-prophecy_hourglass_of_fate,Hourglass of Fate,Light,3,2,Prophecy,disrupt;counter
+prophecy_written_in_the_stars,Written in the Stars,Light,2,2,Prophecy,draw;disrupt
+prophecy_hourglass_of_fate,Hourglass of Fate,Light,3,2,Prophecy,disrupt
 prophecy_oracles_intervention,Oracle's Intervention,Light,3,2,Prophecy,draw
 prophecy_fulfillment_of_doom,Fulfillment of Doom,Dark,3,1,Prophecy,
 prophecy_threads_of_fate,Threads of Fate,Light,3,3,Prophecy,draw
-lost_divine_intervention,Divine Intervention,Holy,3,2,Lost,special;disrupt;power_increase;counter
-lost_fear,Fear,Light,3,3,Lost,disrupt;counter;inflict_status
+lost_divine_intervention,Divine Intervention,Holy,3,2,Lost,special;disrupt;power_increase;disrupt
+lost_fear,Fear,Light,3,3,Lost,disrupt;inflict_status
 lost_radiant_retrieval,Radiant Retrieval,Light,2,3,Lost,draw;search_draw
 lost_arcane_reset,Arcane Reset,Light,3,3,Lost,disrupt;special
 lost_seal_of_denial,Seal of Denial,Light,2,3,Lost,disrupt
@@ -56,7 +56,7 @@ pain_wounds_of_betrayal,Wounds of Betrayal,Light,3,3,Pain,movement_increase;powe
 pain_gift_of_agony,Gift of Agony,Dark,4,1,Pain,power_increase
 pain_torment_bind,Torment Bind,Light,3,2,Pain,special
 pain_lingering_miasma,Lingering Miasma,Light,3,2,Pain,
-panic_demonic_intervention,Demonic Intervention,Dark,4,1,Panic,power_increase;counter
+panic_demonic_intervention,Demonic Intervention,Dark,4,1,Panic,power_increase;disrupt
 panic_rush,Rush,Light,3,2,Panic,movement_increase
 panic_terror_grip,Terror Grip,Light,4,4,Panic,power_reduction;movement_reduction
 panic_paralysing_dread,Paralysing Dread,Light,3,2,Panic,disrupt
@@ -78,7 +78,7 @@ flame_flame_surge,Flame Surge,Light,3,2,Flame,combat
 flame_ember_shield,Ember Shield,Light,4,2,Flame,disrupt
 flame_flame_unbound,Flame Unbound,Light,3,3,Flame,search_draw
 flame_burning_grace,Burning Grace,Holy,3,2,Flame,combat
-flame_purging_fire,Purging Fire,Light,4,3,Flame,counter
+flame_purging_fire,Purging Fire,Light,4,3,Flame,disrupt
 thenobility_kings_gaze,King's Gaze,Light,3,2,The Nobility,
 thenobility_champions_glory,Champion's Glory,Holy,3,2,The Nobility,
 thenobility_last_wish,Last Wish,Light,3,2,The Nobility,
@@ -93,12 +93,12 @@ thetrickster_feint,Feint,Light,3,2,The Trickster,
 thetrickster_ensnare_1,Ensnare 1,Light,3,1,The Trickster,
 thetrickster_ensnare_2,Ensnare 2,Light,3,1,The Trickster,
 thetrickster_ensnare_3,Ensnare 3,Light,3,1,The Trickster,
-chaos_break_reality,Break Reality,Light,4,1,Chaos,counter
+chaos_break_reality,Break Reality,Light,4,1,Chaos,disrupt
 chaos_chaotic_surge,Chaotic Surge,Light,3,2,Chaos,combat
 chaos_confusion,Confusion,Light,3,2,Chaos,
 chaos_unpredictable_boon,Unpredictable Boon,Light,3,2,Chaos,combat
 chaos_cascading_instability,Cascading Instability,Light,3,2,Chaos,
-chaos_collapsing_space,Collapsing Space,Light,3,1,Chaos,counter
+chaos_collapsing_space,Collapsing Space,Light,3,1,Chaos,disrupt
 chaos_schrodingers_grimoire,Schrödinger’s Grimoire,Dark,5,1,Chaos,
 energy_supernova_energy_converter,Supernova Energy Converter,Light,4,2,Energy,
 energy_energy_burst,Energy Burst,Light,3,1,Energy,special
@@ -140,7 +140,7 @@ echoes_repeat,Repeat,Light,3,2,Echoes,draw
 echoes_recall,Recall,Light,3,2,Echoes,draw
 echoes_inversion,Inversion,Light,3,2,Echoes,
 echoes_echo_sanctuary,Echo Sanctuary,Holy,3,2,Echoes,
-echoes_resonance_shift,Resonance Shift,Light,3,2,Echoes,move;counter
+echoes_resonance_shift,Resonance Shift,Light,3,2,Echoes,move;disrupt
 echoes_disturbance,Disturbance,Light,3,2,Echoes,disrupt
 shadows_retribution,Retribution,Shadow,4,1,Shadows,combat
 shadows_echo,Echo,Shadow,3,1,Shadows,
