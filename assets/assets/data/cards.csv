@@ -4,7 +4,7 @@ c_speed,Speed,Light,1,4,Focus,Movement Increase
 c_enhance,Enhance,Light,1,3,Focus,Power Increase
 c_shield,Shield,Light,1,4,Focus,Power Increase;disrupt
 c_counter,Counter,Light,1,4,Focus,disrupt
-c_haste,Haste,Light,1,3,Focus,Power Increase;special;Movement Increase
+c_haste,Haste,Light,1,3,Focus,Movement Increase;special
 c_sorcerersgambit,Sorcerer's Gambit,Light,1,2,Focus,draw;search_draw
 c_arcane_vision,Arcane Vision,Light,1,2,Focus,draw;search_draw
 c_teleport,Teleport,Light,1,2,Focus,Movement Increase
@@ -108,10 +108,10 @@ energy_fears_grasp,Fear's Grasp,Light,4,1,Energy,Power Increase;disrupt
 energy_rage_unleashed,Rage Unleashed,Light,4,1,Energy,Power Increase;Movement Increase;disrupt
 energy_greeds_influence,Greed's Influence,Dark,5,1,Energy,draw;disrupt
 order_martial_command,Martial Command,Light,3,1,Order,Movement Increase;Power Increase;disrupt
-order_absolute_authority,Absolute Authority,Light,3,3,Order,disrupt;inflict_status
-order_chain_of_command,Chain of Command,Light,3,1,Order,Movement Increase;disrupt
-order_silence_rebellion,Silence Rebellion,Dark,4,1,Order,disrupt
-order_blockade,Blockade,Light,3,3,Order,disrupt
+order_absolute_authority,Absolute Authority,Light,3,3,Order,disrupt;inflict_status;Movement Decrease
+order_chain_of_command,Chain of Command,Light,3,1,Order,Movement Increase;disrupt;Movement Decrease
+order_silence_rebellion,Silence Rebellion,Dark,4,1,Order,disrupt;Movement Decrease
+order_blockade,Blockade,Light,3,3,Order,disrupt;Movement Decrease
 madness_twisted_space,Twisted Space,Light,4,1,Madness,Movement Increase
 madness_shattered_time,Shattered Time,Light,5,1,Madness,disrupt;Movement Increase;draw
 madness_splintered_mind,Splintered Mind,Light,3,1,Madness,Power Increase;disrupt
