@@ -86,7 +86,7 @@ thenobility_knighted_by_fire,Knighted by Fire,Light,3,2,The Nobility,Movement In
 thenobility_knights_vow,Knight's Vow,Light,3,2,The Nobility,disrupt
 thetrickster_rogues_gambit,Rogue's Gambit,Light,3,2,The Trickster,Movement Increase
 thetrickster_smoke_and_mirrors,Smoke and Mirrors,Light,3,2,The Trickster,Movement Increase;disrupt
-thetrickster_poison,Poison,Light,4,3,The Trickster,
+thetrickster_poison,Poison,Light,4,3,The Trickster,special;power_reduction;movement_reduction;disrupt
 thetrickster_slipstream_decoy,Slipstream Decoy,Light,3,2,The Trickster,Movement Increase;disrupt
 thetrickster_decoy_form,Decoy Form,Light,3,2,The Trickster,disrupt;draw
 thetrickster_feint,Feint,Light,3,2,The Trickster,Movement Increase;disrupt;special
@@ -154,5 +154,5 @@ starlight_guiding_star,Guiding Star,Astral,4,2,Starlight,draw;disrupt
 starlight_phase_shift,Phase Shift,Astral,4,2,Starlight,disrupt
 starlight_celestial_fortification,Celestial Fortification,Astral,4,2,Starlight,Power Increase
 starlight_stargaze,Stargaze,Astral,4,2,Starlight,draw
-starlight_eclipse,Eclipse,Astral,4,2,Starlight,
-starlight_sirisum,Sirisum,Astral,5,1,Starlight,
+starlight_eclipse,Eclipse,Astral,4,2,Starlight,draw;special
+starlight_sirisum,Sirisum,Astral,5,1,Starlight,special
