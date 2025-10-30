@@ -63,10 +63,6 @@
     "file": "587dd1344821901192a7df12c20bcd1c.bin",
     "mime": "image/png"
   },
-  "lost_mend": {
-    "file": "d1218cd1d0deb306d61bfa9f0faa3253.bin",
-    "mime": "image/png"
-  },
   "legend_excaliburs_blessing": {
     "file": "39075ef8f7851dbb915db887fa7b7964.bin",
     "mime": "image/png"
@@ -113,6 +109,10 @@
   },
   "prophecy_threads_of_fate": {
     "file": "a6f880be1f74cb350ba196645140d713.bin",
+    "mime": "image/png"
+  },
+  "lost_mend": {
+    "file": "d1218cd1d0deb306d61bfa9f0faa3253.bin",
     "mime": "image/png"
   },
   "lost_divine_intervention": {
