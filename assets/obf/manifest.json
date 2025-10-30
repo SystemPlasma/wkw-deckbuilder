@@ -1,42 +1,42 @@
 {
   "c_infinity": {
-    "file": "df9560ba0e9b2798055df7c34cb92254.bin",
+    "file": "b3b32896c1d6c4848b2021038339cdb8.bin",
     "mime": "image/png"
   },
   "c_speed": {
-    "file": "8ff0e043721733aec5c15912485a4127.bin",
+    "file": "fea02ba570248f28ff87a15fe413db34.bin",
     "mime": "image/png"
   },
   "c_enhance": {
-    "file": "5b562e7260a0d0f3c7e3e8149cec0f12.bin",
+    "file": "0d36b62b789d33fa5bd700ca41883c2b.bin",
     "mime": "image/png"
   },
   "c_shield": {
-    "file": "81189c543f840be5c75ab2be5cd03615.bin",
+    "file": "915834d2ace7a14d87f2ed213c572bb8.bin",
     "mime": "image/png"
   },
   "c_counter": {
-    "file": "18922665ec0d86625a6619ebbdac0ed3.bin",
+    "file": "115812e3f56ed3d240cf994ff16d494f.bin",
     "mime": "image/png"
   },
   "c_haste": {
-    "file": "a83246ca033fac367d84301b103f9acc.bin",
+    "file": "b1d78aba146dffd0e10e66f93ee4276a.bin",
     "mime": "image/png"
   },
   "c_sorcerersgambit": {
-    "file": "c59ebfc4c398f4677cd7335d509cd176.bin",
+    "file": "1928e708889f99c916e77bdbe864651a.bin",
     "mime": "image/png"
   },
   "c_arcane_vision": {
-    "file": "283eef7fa6200a6b4c4465ff1d044844.bin",
+    "file": "8d0178f086521d14cd628f1b7e350fe4.bin",
     "mime": "image/png"
   },
   "c_teleport": {
-    "file": "4fe679e92d9ae75f060e8313cc7bac0e.bin",
+    "file": "690544b8b37e11f9f5612f20e96e27f3.bin",
     "mime": "image/png"
   },
   "c_dread": {
-    "file": "463dc6a265ea488458b4d8804d5a09d7.bin",
+    "file": "21a7b320a04a869d65560a0517589a82.bin",
     "mime": "image/png"
   },
   "s_gainwisdom": {
@@ -44,7 +44,7 @@
     "mime": "image/png"
   },
   "s_flexibletactics": {
-    "file": "732173670b9a7f19c5ea69300fd671bb.bin",
+    "file": "c16a3f3c363f667236106ad5e3be5210.bin",
     "mime": "image/png"
   },
   "s_foolscourage": {
@@ -52,15 +52,15 @@
     "mime": "image/png"
   },
   "s_trialanderror": {
-    "file": "38609cd0c8161ea7b1212764b792cad0.bin",
+    "file": "e0434091e25433e3280560114255faae.bin",
     "mime": "image/png"
   },
   "s_glimpseofinsight": {
-    "file": "f607510c4c6e899a133a65451a868717.bin",
+    "file": "6a1201d2c47a8f2ff57c56c71a7233fb.bin",
     "mime": "image/png"
   },
   "s_callofancients": {
-    "file": "f028e4394365dbe444b9ed8b23601f48.bin",
+    "file": "587dd1344821901192a7df12c20bcd1c.bin",
     "mime": "image/png"
   },
   "lost_mend": {
@@ -72,7 +72,7 @@
     "mime": "image/png"
   },
   "legend_manticores_wrath": {
-    "file": "6102355da6bdcb12de72933a6c4f31d8.bin",
+    "file": "28e756f15336b6590da53b4b6f63c60b.bin",
     "mime": "image/png"
   },
   "legend_medusas_gaze": {
@@ -80,19 +80,19 @@
     "mime": "image/png"
   },
   "legend_sirens_song": {
-    "file": "492655377f9fb3d753fd2e3cf7ac64f6.bin",
+    "file": "470439d497ddc5571caa3ffc83a6bd09.bin",
     "mime": "image/png"
   },
   "legend_wings_of_icarus": {
-    "file": "e3a8cd586fb1b68cd1fe2a8779ba5d75.bin",
+    "file": "f0259bbeddefa0bd881ec34e9ffe5dc9.bin",
     "mime": "image/png"
   },
   "legend_cry_of_the_banshee": {
-    "file": "c80d1a674377f05fcb65646b426d13ad.bin",
+    "file": "875d871387003e23467b18ac2a90f2bb.bin",
     "mime": "image/png"
   },
   "prophecy_vision_of_destiny": {
-    "file": "4ecb38b9f903a47231c1d40578c01b51.bin",
+    "file": "a832a0ff7d2f37d8256ff847002ddc94.bin",
     "mime": "image/png"
   },
   "prophecy_written_in_the_stars": {
@@ -100,7 +100,7 @@
     "mime": "image/png"
   },
   "prophecy_hourglass_of_fate": {
-    "file": "04f7151f5da63ddec0eaf7ea9d0d1065.bin",
+    "file": "87b7263af1dfa0772b54a2c55e606c69.bin",
     "mime": "image/png"
   },
   "prophecy_oracles_intervention": {
@@ -108,43 +108,43 @@
     "mime": "image/png"
   },
   "prophecy_fulfillment_of_doom": {
-    "file": "bf5452b3dd30ff235be07cad9cd9f913.bin",
+    "file": "a6f880be1f74cb350ba196645140d713.bin",
     "mime": "image/png"
   },
   "prophecy_threads_of_fate": {
-    "file": "54187f85e90a9022946c8c7eab2c83fa.bin",
+    "file": "40b94cb3934fdc987bc2bb9c00a406e7.bin",
     "mime": "image/png"
   },
   "lost_divine_intervention": {
-    "file": "4e5afc3e96b123a0fed33608614ff577.bin",
+    "file": "2800e1d79dab2124ad0c897e2d7fa88e.bin",
     "mime": "image/png"
   },
   "lost_fear": {
-    "file": "8132375a3811fa8f37e43c3d273542dc.bin",
+    "file": "3381adc7c858ed138be8ff0b00fdb95b.bin",
     "mime": "image/png"
   },
   "lost_radiant_retrieval": {
-    "file": "e8764251aaea8aba42dadae36abc5b9d.bin",
+    "file": "1bd4438e8cc60f02a0e75eac3b619717.bin",
     "mime": "image/png"
   },
   "lost_arcane_reset": {
-    "file": "99c561bf14f8f356213a80e22d097c93.bin",
+    "file": "23434fcbceb9f4495e1de117f47f193b.bin",
     "mime": "image/png"
   },
   "lost_seal_of_denial": {
-    "file": "589737261b3839b17d6b2d36611a09b9.bin",
+    "file": "cea901d8f69ba752b37ac42f7b7ecbae.bin",
     "mime": "image/png"
   },
   "lost_thought_acceleration": {
-    "file": "a4ac21044935f85e6419835ce36870e6.bin",
+    "file": "e1e98ddeba8fa1b915464572c47922de.bin",
     "mime": "image/png"
   },
   "lost_wish": {
-    "file": "1c681d387d8f3ccf291253931db5faba.bin",
+    "file": "64cefe9dd16f16da2f03fc48efe1bf56.bin",
     "mime": "image/png"
   },
   "lost_mystical_knowledge": {
-    "file": "5d4ac92e405051cd78a094e0309e9965.bin",
+    "file": "11991630c7180f7f66c7bb5de13f1d4f.bin",
     "mime": "image/png"
   },
   "thecrown_majestys_valor": {
@@ -152,11 +152,11 @@
     "mime": "image/png"
   },
   "thecrown_divine_favor": {
-    "file": "206899d8e9a3c7da7e9340b4d5a8316a.bin",
+    "file": "cbcd6f87f70da561ef3b3616b2b1d33a.bin",
     "mime": "image/png"
   },
   "thecrown_radiant_aegis": {
-    "file": "a1c97d577361c5e89ef02f4c245a292e.bin",
+    "file": "1c4a873fa53931e73fc9bd4854397612.bin",
     "mime": "image/png"
   },
   "thecrown_royal_aura": {
@@ -164,7 +164,7 @@
     "mime": "image/png"
   },
   "thecrown_royal_destiny": {
-    "file": "dfd28378b7cecbd3c2f56468b01df825.bin",
+    "file": "f0e80228f24719856bd8f58edfb40e8c.bin",
     "mime": "image/png"
   },
   "thecrown_heirs_prerogative": {
@@ -172,23 +172,23 @@
     "mime": "image/png"
   },
   "thecrown_mimic_mantle": {
-    "file": "47043fdcdfb6f238f79c11032f28daba.bin",
+    "file": "6e6f1414158abd1aa458fb099af5ca4d.bin",
     "mime": "image/png"
   },
   "thecrown_royal_mantle": {
-    "file": "04b0b64c7b6900a4f67ceb28d5dfc7c1.bin",
+    "file": "7633cf390a6b4ea0ed0d3f297ce7f2e4.bin",
     "mime": "image/png"
   },
   "thewilds_thorn_shield": {
-    "file": "d43e2d0fca7ea4fafd505afa1a55638e.bin",
+    "file": "4e96edd2283c62bce6b6de4c4b587f48.bin",
     "mime": "image/png"
   },
   "thewilds_twilight_reign": {
-    "file": "ac2398ba7639a9c646e5415a2df14ba1.bin",
+    "file": "52c64c3604b7fb32a59ff54196279ba0.bin",
     "mime": "image/png"
   },
   "thewilds_verdant_judgement": {
-    "file": "d757f0fff072aeb8bb20c148d9628c15.bin",
+    "file": "aae51a32d2ac6b6005eab9e3e2b8d38a.bin",
     "mime": "image/png"
   },
   "thewilds_path_of_thorns": {
@@ -196,15 +196,15 @@
     "mime": "image/png"
   },
   "thewilds_whispers_of_the_wild": {
-    "file": "0475fae63953062f459d833547943a45.bin",
+    "file": "f44f3718b20245f5918909186fe4be07.bin",
     "mime": "image/png"
   },
   "thewilds_rootshift": {
-    "file": "1071284eff07eaa548458eeda62acc15.bin",
+    "file": "98372761e9e1fc827754677c736f0e82.bin",
     "mime": "image/png"
   },
   "pain_agonys_grasp": {
-    "file": "68c123df9a1af6e9204f0705d55227f0.bin",
+    "file": "4096d218d788ce8dee3c81304e29fbb6.bin",
     "mime": "image/png"
   },
   "pain_surge_of_desperation": {
@@ -216,7 +216,7 @@
     "mime": "image/png"
   },
   "pain_gift_of_agony": {
-    "file": "d39fc2c3250d0c8d71f26c179bbd76b5.bin",
+    "file": "eefd95c916da960d5f7df4a4b89ad866.bin",
     "mime": "image/png"
   },
   "pain_torment_bind": {
@@ -228,11 +228,11 @@
     "mime": "image/png"
   },
   "panic_demonic_intervention": {
-    "file": "608223c6cf46e58e7b8212aa8fc62600.bin",
+    "file": "3dc7584a99121c5ebf22180dd74237a4.bin",
     "mime": "image/png"
   },
   "panic_rush": {
-    "file": "470c552dcfbc86e739ef429476a84744.bin",
+    "file": "0ed5b92cce5b94233f1368bbebcba248.bin",
     "mime": "image/png"
   },
   "panic_terror_grip": {
@@ -240,11 +240,11 @@
     "mime": "image/png"
   },
   "panic_paralysing_dread": {
-    "file": "982712aea5684a22e72bdef9fab3ae96.bin",
+    "file": "0bdea7bd1b3e9743ea2292c7df24a7ef.bin",
     "mime": "image/png"
   },
   "panic_disruption": {
-    "file": "e53890b76b1fcd749cdc23d227331de9.bin",
+    "file": "8c6e67e09600ca5806d8940877ed10c0.bin",
     "mime": "image/png"
   },
   "panic_fracture": {
@@ -252,23 +252,23 @@
     "mime": "image/png"
   },
   "terror_veil_of_dread": {
-    "file": "e3e8e045506808da5492988e7ea6cb7f.bin",
+    "file": "04c4e86b0683434dddecdfc84b708525.bin",
     "mime": "image/png"
   },
   "terror_horror": {
-    "file": "35e3db9cddb3147e1a7c647840f92e5b.bin",
+    "file": "0fa4b77db0bfafa538fa8c917518b8df.bin",
     "mime": "image/png"
   },
   "terror_second_shadow": {
-    "file": "12f37adc976937268a27cd7b1b26570d.bin",
+    "file": "a9c396d41e98caa13d33b0115ad68d4c.bin",
     "mime": "image/png"
   },
   "terror_unwelcome_silence": {
-    "file": "f0a0bd2df9f7b3dd35355d5113df0076.bin",
+    "file": "caa095ca5a3e26d3dd49c6aa442202ce.bin",
     "mime": "image/png"
   },
   "terror_deadly_deal": {
-    "file": "13d84b3dd8a08090e9bc28129fc318a4.bin",
+    "file": "abe21c3632acf94cc64072a506916f25.bin",
     "mime": "image/png"
   },
   "blood_blood_pact": {
@@ -624,7 +624,7 @@
     "mime": "image/png"
   },
   "starlight_sirisum": {
-    "file": "ebbd9b1fc23e850765a687de3c322a62.bin",
+    "file": "395f30e9c289054ccb0bbcfbb3c4593f.bin",
     "mime": "image/png"
   }
 }
