@@ -14,7 +14,7 @@ s_dash,Dash,Light,2,4,Study,Movement Increase
 s_gate,Gate,Light,2,2,Study;Movement Increase,
 s_surge,Surge,Light,2,1,Study;special,
 s_augment,Augment,Light,2,2,Study,Power Increase,
-c_forcefield,Force Field,Light,2,2,Study,Power Increase;disrupt,
+s_forcefield,Force Field,Light,2,2,Study,Power Increase;disrupt,
 s_deepen,Deepen,Light,2,2,Study,draw;search_draw,
 s_mysticalknowledge,Mystical Knowledge,light,2,2,Study,draw;search_draw,
 s_glimpseofinsight,Glimpse of Insight,Light,2,3,Study,reveal;disrupt,
