@@ -19,7 +19,6 @@ s_deepen,Deepen,Light,2,2,Study,draw;search_draw,
 s_mysticalknowledge,Mystical Knowledge,light,2,2,Study,draw;search_draw,
 s_glimpseofinsight,Glimpse of Insight,Light,2,3,Study,reveal;disrupt,
 s_callofancients,Call of Ancients,Dark,2,1,Study,Movement Increase,
-
 legend_excaliburs_blessing,Excalibur's Blessing,Light,3,1,Legend,Power Increase;special,
 legend_manticores_wrath,Manticores' Wrath,Light,3,2,Legend,Power Increase;disrupt;Movement Increase,
 legend_medusas_gaze,Medusa's Gaze,Light,3,2,Legend,disrupt;inflict_status,
