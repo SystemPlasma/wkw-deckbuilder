@@ -35,24 +35,36 @@
     "file": "690544b8b37e11f9f5612f20e96e27f3.bin",
     "mime": "image/png"
   },
+  "c_refine": {
+    "file": "fcc442140d6acf9a20f1b5d056c11091.bin",
+    "mime": "image/png"
+  },
   "c_dread": {
     "file": "3dcc4767425d71f6fa476395c4465f5f.bin",
     "mime": "image/png"
   },
-  "s_gainwisdom": {
-    "file": "f156db938cad93dd11516280e3358fec.bin",
+  "s_dash": {
+    "file": "764841fb99f5bc6d453e7f5a67c90af8.bin",
     "mime": "image/png"
   },
-  "s_flexibletactics": {
-    "file": "d49f754661ef85dec71cb42ad409b50e.bin",
+  "s_gate": {
+    "file": "3868d6ee925ba7fbb41ec11eaede03e5.bin",
     "mime": "image/png"
   },
-  "s_foolscourage": {
-    "file": "ba7ccc0decb3bf64ad955bac2484b47a.bin",
+  "s_surge": {
+    "file": "335f2a1a6508ce48d88aa8883334a229.bin",
     "mime": "image/png"
   },
-  "s_trialanderror": {
-    "file": "de93f8bbe3d9940ef023ed947ff9099a.bin",
+  "s_augment": {
+    "file": "e1e758a4f9990d54091a23b63d965ff2.bin",
+    "mime": "image/png"
+  },
+  "s_deepen": {
+    "file": "3e673a199ffa555df82d959b8e6642ce.bin",
+    "mime": "image/png"
+  },
+  "s_mysticalknowledge": {
+    "file": "c089639c39cf7270834ee4305fa13d7c.bin",
     "mime": "image/png"
   },
   "s_glimpseofinsight": {
@@ -141,10 +153,6 @@
   },
   "lost_wish": {
     "file": "64cefe9dd16f16da2f03fc48efe1bf56.bin",
-    "mime": "image/png"
-  },
-  "lost_mystical_knowledge": {
-    "file": "11991630c7180f7f66c7bb5de13f1d4f.bin",
     "mime": "image/png"
   },
   "thecrown_majestys_valor": {
