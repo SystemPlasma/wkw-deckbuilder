@@ -2398,17 +2398,24 @@ export default function App() {
   }, [cardsById]);
 
   // Default load: all Focus spells (fills the Grimoire to its base 60 pages)
+  const didDefaultLoadRef = useRef(false);
   useEffect(() => {
+    if (didDefaultLoadRef.current) return;
+    if (cards.length === 0) return;
     const hasAny = Object.values(entries).some((q) => (q || 0) > 0);
-    if (hasAny) return;
+    if (hasAny) {
+      didDefaultLoadRef.current = true;
+      return;
+    }
     const focusList = cards.filter((c) => c.aspect === FOCUS_SLUG && !isReferenceCard(c));
-    if (focusList.length === 0) return;
+    if (focusList.length === 0) { didDefaultLoadRef.current = true; return; }
     const next: Record<string, number> = {};
     for (const c of focusList) {
       const max = Number(c.maxCopies || 0);
       next[c.id] = max > 0 ? max : 1;
     }
     setEntries(next);
+    didDefaultLoadRef.current = true;
   }, [cards, entries]);
 
   function setQty(cardId: string, n: number) {
