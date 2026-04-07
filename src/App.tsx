@@ -948,51 +948,55 @@ function CardRow({
             </button>
           )}
         </div>
-        <div className="grid grid-cols-3 grid-rows-2 items-center gap-x-2 gap-y-1">
-          <button
-            onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); onChange(n); }}
-            disabled={controlsDisabled || qty <= 0}
-            className={["px-1.5 py-1 rounded shadow-sm text-base font-bold text-slate-900 dark:text-slate-900 leading-none", qty <= 0 ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
-          >
-            -
-          </button>
-          <div className="w-7 text-center">{qty}</div>
-          <button
-            onClick={() => {
-            if (controlsDisabled) return;
-            if (noRoomType) { onCapAttempt?.(capType); return; }
-            if (addDisabled) return;
-            const n = Math.min(card.maxCopies, qty + 1);
-            onChange(n);
-          }}
-            disabled={controlsDisabled || noRoomTotal || qty >= card.maxCopies}
-            className={["px-1.5 py-1 rounded shadow-sm text-base font-bold text-slate-900 dark:text-slate-900 leading-none", locked || addDisabled || qty >= card.maxCopies ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
-          >
-            +
-          </button>
-          <button
-            onClick={() => {
+        {readOnly ? (
+          <div className="text-sm text-slate-500 dark:text-slate-300 px-2">x{qty}</div>
+        ) : (
+          <div className="grid grid-cols-3 grid-rows-2 items-center gap-x-2 gap-y-1">
+            <button
+              onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); onChange(n); }}
+              disabled={controlsDisabled || qty <= 0}
+              className={["px-1.5 py-1 rounded shadow-sm text-base font-bold text-slate-900 dark:text-slate-900 leading-none", qty <= 0 ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
+            >
+              -
+            </button>
+            <div className="w-7 text-center">{qty}</div>
+            <button
+              onClick={() => {
               if (controlsDisabled) return;
-              if (!countsTowardPages) { onChange(card.maxCopies); return; }
-              const roomTotal = Math.max(0, remainingSlots);
-              const roomType = Math.max(0, remainingTypeSlots);
-              const room = Math.min(roomTotal, roomType);
-              if (room <= 0) { if (roomType <= 0) onCapAttempt?.(capType); return; }
-              const target = Math.min(card.maxCopies, qty + room);
-              onChange(target);
+              if (noRoomType) { onCapAttempt?.(capType); return; }
+              if (addDisabled) return;
+              const n = Math.min(card.maxCopies, qty + 1);
+              onChange(n);
             }}
-            disabled={controlsDisabled || noRoomTotal}
-            className={[
-              "col-start-3 row-start-2 justify-self-end px-1.5 py-1 text-xs rounded shadow-sm",
-              (locked || noRoomTotal)
-                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"
-            ].join(' ')}
-            title={`Set to Max (${card.maxCopies})`}
-          >
-            MAX
-          </button>
-        </div>
+              disabled={controlsDisabled || noRoomTotal || qty >= card.maxCopies}
+              className={["px-1.5 py-1 rounded shadow-sm text-base font-bold text-slate-900 dark:text-slate-900 leading-none", locked || addDisabled || qty >= card.maxCopies ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
+            >
+              +
+            </button>
+            <button
+              onClick={() => {
+                if (controlsDisabled) return;
+                if (!countsTowardPages) { onChange(card.maxCopies); return; }
+                const roomTotal = Math.max(0, remainingSlots);
+                const roomType = Math.max(0, remainingTypeSlots);
+                const room = Math.min(roomTotal, roomType);
+                if (room <= 0) { if (roomType <= 0) onCapAttempt?.(capType); return; }
+                const target = Math.min(card.maxCopies, qty + room);
+                onChange(target);
+              }}
+              disabled={controlsDisabled || noRoomTotal}
+              className={[
+                "col-start-3 row-start-2 justify-self-end px-1.5 py-1 text-xs rounded shadow-sm",
+                (locked || noRoomTotal)
+                  ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                  : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"
+              ].join(' ')}
+              title={`Set to Max (${card.maxCopies})`}
+            >
+              MAX
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Left: name button (desktop) */}
@@ -1043,50 +1047,56 @@ function CardRow({
 
       {/* Right controls pinned to the far right (desktop) */}
       <div className="hidden md:flex items-center gap-2 shrink-0 md:col-start-3 md:justify-self-end">
-        <button
-          onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); console.log('[CardRow.qty-]', { id: card.id, from: qty, to: n }); onChange(n); }}
-          disabled={controlsDisabled || qty <= 0}
-          className={["px-1.5 py-1 md:px-2 rounded shadow-sm text-base md:text-lg font-bold text-slate-900 dark:text-slate-900 leading-none", qty <= 0 ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
-        >
-          -
-        </button>
-        <div className="w-7 md:w-8 text-center">{qty}</div>
-        <button
-          onClick={() => {
-            if (controlsDisabled) return;
-            if (noRoomType) { onCapAttempt?.(capType); return; }
-            if (addDisabled) return;
-            const n = Math.min(card.maxCopies, qty + 1);
-            console.log('[CardRow.qty+]', { id: card.id, from: qty, to: n });
-            onChange(n);
-          }}
-          disabled={controlsDisabled || noRoomTotal || qty >= card.maxCopies}
-          className={["px-1.5 py-1 md:px-2 rounded shadow-sm text-base md:text-lg font-bold text-slate-900 dark:text-slate-900 leading-none", locked || addDisabled || qty >= card.maxCopies ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
-        >
-          +
-        </button>
-        <button
-          onClick={() => {
-            if (controlsDisabled) return;
-            if (!countsTowardPages) {
-              console.log('[CardRow.max]', { id: card.id, to: card.maxCopies });
-              onChange(card.maxCopies);
-              return;
-            }
-            const roomTotal = Math.max(0, remainingSlots);
-            const roomType = Math.max(0, remainingTypeSlots);
-            const room = Math.min(roomTotal, roomType);
-            if (room <= 0) { if (roomType <= 0) onCapAttempt?.(capType); return; }
-            const target = Math.min(card.maxCopies, qty + room);
-            console.log('[CardRow.max]', { id: card.id, from: qty, room, to: target });
-            onChange(target);
-          }}
-          disabled={controlsDisabled || noRoomTotal}
-          className={["px-1.5 py-1 md:px-2 text-xs md:text-sm rounded shadow-sm", (locked || noRoomTotal) ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"].join(' ')}
-          title={`Set to Max (${card.maxCopies})`}
-        >
-          MAX
-        </button>
+        {readOnly ? (
+          <div className="text-sm text-slate-500 dark:text-slate-300">x{qty}</div>
+        ) : (
+          <>
+            <button
+              onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); console.log('[CardRow.qty-]', { id: card.id, from: qty, to: n }); onChange(n); }}
+              disabled={controlsDisabled || qty <= 0}
+              className={["px-1.5 py-1 md:px-2 rounded shadow-sm text-base md:text-lg font-bold text-slate-900 dark:text-slate-900 leading-none", qty <= 0 ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
+            >
+              -
+            </button>
+            <div className="w-7 md:w-8 text-center">{qty}</div>
+            <button
+              onClick={() => {
+                if (controlsDisabled) return;
+                if (noRoomType) { onCapAttempt?.(capType); return; }
+                if (addDisabled) return;
+                const n = Math.min(card.maxCopies, qty + 1);
+                console.log('[CardRow.qty+]', { id: card.id, from: qty, to: n });
+                onChange(n);
+              }}
+              disabled={controlsDisabled || noRoomTotal || qty >= card.maxCopies}
+              className={["px-1.5 py-1 md:px-2 rounded shadow-sm text-base md:text-lg font-bold text-slate-900 dark:text-slate-900 leading-none", locked || addDisabled || qty >= card.maxCopies ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
+            >
+              +
+            </button>
+            <button
+              onClick={() => {
+                if (controlsDisabled) return;
+                if (!countsTowardPages) {
+                  console.log('[CardRow.max]', { id: card.id, to: card.maxCopies });
+                  onChange(card.maxCopies);
+                  return;
+                }
+                const roomTotal = Math.max(0, remainingSlots);
+                const roomType = Math.max(0, remainingTypeSlots);
+                const room = Math.min(roomTotal, roomType);
+                if (room <= 0) { if (roomType <= 0) onCapAttempt?.(capType); return; }
+                const target = Math.min(card.maxCopies, qty + room);
+                console.log('[CardRow.max]', { id: card.id, from: qty, room, to: target });
+                onChange(target);
+              }}
+              disabled={controlsDisabled || noRoomTotal}
+              className={["px-1.5 py-1 md:px-2 text-xs md:text-sm rounded shadow-sm", (locked || noRoomTotal) ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"].join(' ')}
+              title={`Set to Max (${card.maxCopies})`}
+            >
+              MAX
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
