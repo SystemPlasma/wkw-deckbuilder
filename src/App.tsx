@@ -443,10 +443,21 @@ function createDefaultModeAutoLockState(): Record<ModeToggleId, boolean> {
   }, {} as Record<ModeToggleId, boolean>);
 }
 
+function formatAspectTitle(aspect: Aspect, unlocked: boolean): string {
+  const slug = aspect.slug;
+  if (slug === 'cursedpages') return 'Cursed Pages';
+  const raw = aspect.name || aspect.slug;
+  const base = raw
+    .replace(/^Aspect of\s+/i, '')
+    .replace(/^Dark Art of\s+/i, '')
+    .trim();
+  if (!unlocked) return aspect.isDark ? 'Dark Art of ???' : 'Aspect of ???';
+  if (aspect.isDark) return `Dark Art of ${base}`;
+  return raw.startsWith('Aspect of') ? raw : `Aspect of ${base}`;
+}
+
 function aspectDisplayName(aspect: Aspect, unlocked: boolean): string {
-  const base = aspect.name || aspect.slug;
-  if (unlocked) return base.startsWith('Aspect of') ? base : `Aspect of ${base}`;
-  return base.startsWith('Aspect of') ? 'Aspect of ???' : 'Aspect of ???';
+  return formatAspectTitle(aspect, unlocked);
 }
 
 type AdditionalGroupRenderArgs = {
@@ -3618,9 +3629,10 @@ export default function App() {
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                       <div />
                       <div className="font-bold text-slate-900 dark:text-slate-100 text-center" style={{ fontSize: '24px' }}>
-                        {group.name && group.name.startsWith('Aspect of ')
-                          ? group.name
-                          : `Aspect of ${group.name}`}
+                        {(() => {
+                          const meta = aspectsBySlug[group.slug] || ({ slug: group.slug, name: group.name } as Aspect);
+                          return formatAspectTitle(meta, true);
+                        })()}
                       </div>
                       <div className="flex justify-end">
                         <button
