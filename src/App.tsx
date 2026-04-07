@@ -2070,7 +2070,7 @@ export default function App() {
     return (DARK_SLUGS as readonly string[]).every((s) => set.has(s));
   })();
   const darkArtsActive = allDarkTrioSelected;
-  const maxNonSpecialAllowed = overrideAll ? 99 : 2;
+  const maxNonSpecialAllowed = Number.POSITIVE_INFINITY;
 
   // Enforce Dark Arts restriction by clearing any [Holy] spells when all three Dark aspects are selected
   useEffect(() => {
