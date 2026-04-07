@@ -371,8 +371,7 @@ const PARALLEL_CARD_IDS = new Set<string>([
 type ModeToggleId =
   | 'starlight_addition'
   | 'shadow_addition'
-  | 'parallel_dimension'
-  | 'fragments_mode';
+  | 'parallel_dimension';
 
 type ModeMessage = { type: 'info' | 'warning' | 'error'; text: string };
 
@@ -402,14 +401,9 @@ const MODE_TOGGLE_META: Record<ModeToggleId, {
     description: 'Reveal Parallel [Light] spells as replacements for standard versions.',
     requiresAnyAspects: ['madness', 'energy'],
   },
-  fragments_mode: {
-    label: 'Fragments Mode',
-    description: 'Limit spells above Rank 2 to a single copy.',
-  },
 };
 
 const MODE_DISPLAY_ORDER: ModeToggleId[] = [
-  'fragments_mode',
   'starlight_addition',
   'shadow_addition',
   'parallel_dimension',
@@ -426,7 +420,6 @@ const MODE_TOGGLE_IDS: ModeToggleId[] = [
   'starlight_addition',
   'shadow_addition',
   'parallel_dimension',
-  'fragments_mode',
 ];
 
 function createDefaultModeState(): Record<ModeToggleId, boolean> {
@@ -1951,7 +1944,6 @@ export default function App() {
     return new Set(unlocks.concat(basics));
   }, [aspects, isBasicAspect, overrideAll, unlocks]);
 
-  const fragmentsModeActive = isModeActive('fragments_mode');
   const starlightModeActive = overrideAll || (isModeActive('starlight_addition') && unlocksSet.has('starlight'));
   const shadowModeActive = overrideAll || (isModeActive('shadow_addition') && unlocksSet.has('shadows'));
   const parallelModeActive = overrideAll || isModeActive('parallel_dimension');
@@ -2262,11 +2254,6 @@ export default function App() {
       return;
     }
 
-    const nonSpecialSelected = chosenAspects
-      .filter((s) => !aspects.find(a => a.slug === s)?.isSpecial)
-      .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
-    const nextSet = new Set([...nonSpecialSelected, slug]);
-    const darkTrioSlugs = DARK_SLUGS as readonly string[];
     setChosenAspects(Array.from(new Set([...chosenAspects, slug])));
 
     // total >= 3 → already at max; do nothing
@@ -2283,14 +2270,10 @@ export default function App() {
   const effectiveMaxCopies = useMemo(() => {
     const map: Record<string, number> = {};
     for (const c of cards) {
-      let max = c.maxCopies;
-      if (fragmentsModeActive && c.rank > 2) {
-        max = Math.min(max, 1);
-      }
-      map[c.id] = max;
+      map[c.id] = c.maxCopies;
     }
     return map;
-  }, [cards, fragmentsModeActive]);
+  }, [cards]);
 
   const availableCards = useMemo(() => {
     return cards
@@ -2605,9 +2588,7 @@ export default function App() {
       // Compute per-card target max copies under intended modes
       const targetMaxById: Record<string, number> = {};
       for (const c of cards) {
-        let max = c.maxCopies;
-        if (fragmentsModeActive && c.rank > 2) max = Math.min(max, 1);
-        targetMaxById[c.id] = max;
+        targetMaxById[c.id] = c.maxCopies;
       }
 
       // Build desired by clamping requested counts to target max
@@ -2949,7 +2930,6 @@ export default function App() {
     return () => window.clearTimeout(t);
   }, [modeMessage]);
   const validateModeChange = React.useCallback((next: Record<ModeToggleId, boolean>): string | null => {
-    const fragmentsNext = Boolean(next.fragments_mode);
     const allowAspectInNext = (slug: string) => {
       if (overrideAll) return true;
       if (slug === 'starlight') return Boolean(next.starlight_addition) && unlocksSet.has('starlight');
@@ -2963,15 +2943,8 @@ export default function App() {
         if (!meta || meta.isSpecial) return false;
         return aspectEligible(slug) && allowAspectInNext(slug);
       });
-    const maxNonSpecialNext = 2;
     const setNon = new Set(nonSpecialNext);
     const includesDarkTrioNext = (DARK_SLUGS as readonly string[]).every((s) => setNon.has(s));
-    const allowedNonSpecial = includesDarkTrioNext
-      ? Math.max(maxNonSpecialNext, (DARK_SLUGS as readonly string[]).length)
-      : maxNonSpecialNext;
-    if (setNon.size > allowedNonSpecial) {
-      return `Adjust aspect selections to ${maxNonSpecialNext} before changing modes.`;
-    }
 
     // No page cap enforcement in current ruleset
 
@@ -2996,25 +2969,8 @@ export default function App() {
       }
     }
 
-    const nextMaxById: Record<string, number> = {};
-    for (const c of cards) {
-      let max = c.maxCopies;
-      if (fragmentsNext && c.rank > 2) {
-        max = Math.min(max, 1);
-      }
-      nextMaxById[c.id] = max;
-    }
-    for (const [id, qty] of Object.entries(entries)) {
-      const max = nextMaxById[id];
-      if (max != null && qty > max) {
-        const card = cards.find((c) => c.id === id);
-        const name = card ? card.name : id;
-        return `Reduce copies of ${name} to ${max} before disabling this mode.`;
-      }
-    }
-
     return null;
-  }, [DARK_SLUGS, allDarkTrioSelected, aspectEligible, aspects, cards, counts, entries, overrideAll, totalQty, unlocks, unlocksSet]);
+  }, [DARK_SLUGS, aspectEligible, aspects, chosenAspects, counts, overrideAll, unlocks, unlocksSet]);
 
   const handleModeToggle = React.useCallback((id: ModeToggleId) => {
     const meta = MODE_TOGGLE_META[id];
@@ -4042,8 +3998,7 @@ export default function App() {
                   return (a.name||'').localeCompare(b.name||'');
                 })
                 .filter(g => canUseGrimoire(g))
-                .map(g => ({ g, meta: expandGrimoire(g) }))
-                .filter(({meta}) => !fragmentsModeActive || meta.fragmentsOk);
+                .map(g => ({ g, meta: expandGrimoire(g) }));
               if (eligible.length===0) {
                 return <div className="text-sm text-center text-slate-500">No Pre-Bound Grimoires are available with your current unlocks.</div>;
               }
@@ -4060,7 +4015,6 @@ export default function App() {
                     const aspectLabel = aspectList.map(s=>nameByAspect[s] || (s.replace(/_/g,' ')||s)).join(' + ');
                     const badges: React.ReactNode[] = [];
                     if (g.recommended) badges.push(<span key="rec" className="text-xs px-2 py-0.5 rounded-full bg-indigo-600 text-white">Recommended</span>);
-                    if (fragmentsModeActive && meta.fragmentsOk) badges.push(<span key="frag" className="text-xs px-2 py-0.5 rounded-full bg-emerald-600 text-white">Fragments Compatible</span>);
                     return (
                       <div key={g.id} className={["rounded-xl border p-3 bg-white/80 dark:bg-slate-900/50", g.recommended? 'border-indigo-500 ring-1 ring-indigo-300 dark:ring-indigo-700':'border-slate-300 dark:border-slate-700'].join(' ')}>
                         <div className="flex items-start justify-between gap-2">
