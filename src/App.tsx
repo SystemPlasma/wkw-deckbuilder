@@ -3723,24 +3723,16 @@ export default function App() {
           {/* Summary + Grimoire (sticky on desktop) */}
           <div className="space-y-4 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-auto lg:pr-1">
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
-              <h3 className="font-semibold mb-2 text-center">Grimoire</h3>
-              <div className="flex items-center justify-center gap-6 text-sm font-medium mb-2">
-                <span>Pages: {totalQty}</span>
-                <span className={inkTotal === inkTarget ? undefined : 'text-red-600 font-semibold'}>
-                  INK: {inkTotal}/{inkTarget}
-                </span>
-              </div>
-              <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
-                <span className="block">Focus spells start loaded; remove any to make room for other spells.</span>
-                <span className="block">Default load: {defaultPages} Focus spells. Remove cards to tailor your Grimoire.</span>
-              </div>
-            </div>
-
-            <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold mb-2 text-center">Grimoire Summary:</h3>
               <div className="text-center font-mono whitespace-pre-wrap">
                 <div className="text-lg">{totalCopies} Spells in Grimoire</div>
-                <div className="flex items-center justify-center gap-6">
+                <div className="flex items-center justify-center gap-6 text-sm font-medium mt-1">
+                  <span>Pages: {totalQty}</span>
+                  <span className={inkTotal === inkTarget ? undefined : 'text-red-600 font-semibold'}>
+                    INK: {inkTotal}/{inkTarget}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-6 mt-2">
                   <span className={capAttempt === 'Holy' ? 'text-red-600 font-bold' : undefined}>
                     [Holy]: {counts.Holy}{darkArtsActive ? ' (blocked)' : ''}{'\u00A0\u00A0\u00A0'}
                   </span>
@@ -3766,8 +3758,10 @@ export default function App() {
             </div>
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
-              <h3 className="font-semibold mb-3 text-center">Grimoire Contents</h3>
+              <h3 className="font-semibold mb-3 text-center">Grimoire</h3>
               <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
+                <span className="block">Focus spells start loaded; remove any to make room for other spells.</span>
+                <span className="block">Default load: {defaultPages} Focus spells. Remove cards to tailor your Grimoire.</span>
                 <span className="block">All selected spells live here.</span>
                 <span className="block">Study is always included.</span>
                 <span className="block">Add up to {darkArtsActive ? '3' : '2'} additional aspects (copy limits only).</span>
