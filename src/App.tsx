@@ -629,6 +629,10 @@ function renderAdditionalGroup(args: AdditionalGroupListArgs) {
 /** ------------------------
  * Small UI helpers
  * ---------------------- */
+function Pill({ children }: { children: React.ReactNode }) {
+  return <span className="px-2 py-1 rounded-full text-xs bg-slate-200 dark:bg-slate-700 dark:text-slate-100">{children}</span>;
+}
+
 function ModeToggleRow({
   label,
   description,
