@@ -948,9 +948,7 @@ function CardRow({
             </button>
           )}
         </div>
-        {readOnly ? (
-          <div className="text-sm text-slate-500 dark:text-slate-300 px-2">x{qty}</div>
-        ) : (
+        {!readOnly && (
           <div className="grid grid-cols-3 grid-rows-2 items-center gap-x-2 gap-y-1">
             <button
               onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); onChange(n); }}
@@ -1027,7 +1025,7 @@ function CardRow({
             })()}
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-300 mt-1">
-            {readOnly ? 'View only' : `Max ${card.maxCopies}`}
+            {readOnly ? `View only · x${qty}` : `Max ${card.maxCopies}`}
           </div>
         </div>
         {/* Desktop: single line with spacing between left (type/rank) and right (Max) */}
@@ -1040,16 +1038,14 @@ function CardRow({
             })()}
           </span>
           <span className="text-sm text-slate-500 dark:text-slate-300 whitespace-nowrap">
-            {readOnly ? 'View only' : `Max ${card.maxCopies}`}
+            {readOnly ? `View only · x${qty}` : `Max ${card.maxCopies}`}
           </span>
         </div>
       </div>
 
       {/* Right controls pinned to the far right (desktop) */}
       <div className="hidden md:flex items-center gap-2 shrink-0 md:col-start-3 md:justify-self-end">
-        {readOnly ? (
-          <div className="text-sm text-slate-500 dark:text-slate-300">x{qty}</div>
-        ) : (
+        {!readOnly && (
           <>
             <button
               onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); console.log('[CardRow.qty-]', { id: card.id, from: qty, to: n }); onChange(n); }}
