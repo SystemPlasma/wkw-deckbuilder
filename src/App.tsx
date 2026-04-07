@@ -3580,19 +3580,22 @@ export default function App() {
                 });
                 return (
                   <div key={group.slug} className="rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 p-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="font-bold text-slate-900 dark:text-slate-100 text-center flex-1" style={{ fontSize: '24px' }}>
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                      <div />
+                      <div className="font-bold text-slate-900 dark:text-slate-100 text-center" style={{ fontSize: '24px' }}>
                         {group.name && group.name.startsWith('Aspect of ')
                           ? group.name
                           : `Aspect of ${group.name}`}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setCollapsedGroups((prev) => ({ ...prev, [group.slug]: !collapsed }))}
-                        className="text-sm px-3 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
-                      >
-                        {collapsed ? 'Expand' : 'Collapse'}
-                      </button>
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setCollapsedGroups((prev) => ({ ...prev, [group.slug]: !collapsed }))}
+                          className="text-sm px-3 py-1 rounded-md border border-slate-300 dark:border-slate-600 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                        >
+                          {collapsed ? 'Expand' : 'Collapse'}
+                        </button>
+                      </div>
                     </div>
 
                     {!collapsed && (
