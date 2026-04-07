@@ -3121,10 +3121,11 @@ export default function App() {
     }
     return map;
   }, [cards]);
-  const totalTravelMp = useMemo(
-    () => additionalSelectedSlugs.reduce((sum, slug) => sum + (travelMpByAspect[slug] || 0), 0),
-    [additionalSelectedSlugs, travelMpByAspect]
-  );
+  const totalTravelMp = useMemo(() => {
+    const base = additionalSelectedSlugs.reduce((sum, slug) => sum + (travelMpByAspect[slug] || 0), 0);
+    const studyMp = travelMpByAspect[STUDY_SLUG] || 0;
+    return base + studyMp;
+  }, [additionalSelectedSlugs, travelMpByAspect]);
   const hasAdditionalUnlocked = Boolean(
     (additionalLostAspect && (overrideAll || unlocksSet.has(additionalLostAspect.slug))) ||
     additionalAspectGroups.some(group => group.some(a => overrideAll || unlocksSet.has(a.slug)))
