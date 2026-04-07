@@ -1851,7 +1851,7 @@ export default function App() {
   const isModeActive = React.useCallback((id: ModeToggleId) => Boolean(modeToggles[id]), [modeToggles]);
 
   // Selection
-  const [basicsSelected, setBasicsSelected] = useState<string[]>([STUDY_SLUG]); // Path starts with Study
+  const [basicsSelected, setBasicsSelected] = useState<string[]>([FOCUS_SLUG, STUDY_SLUG]); // Grimoire starts with Focus + Study
   const [chosenAspects, setChosenAspects] = useState<string[]>([]); // Non-basics
 
   // Entries: cardId → qty
@@ -1949,34 +1949,25 @@ export default function App() {
 
   const selectedAspectSlugs = useMemo(() => {
     if (overrideAll) {
-      return aspects.map((a) => a.slug).filter((slug) => slug !== FOCUS_SLUG);
+      return aspects.map((a) => a.slug);
     }
     return [...basicsSelected, ...chosenAspects]
-      .filter((slug) => slug !== FOCUS_SLUG)
       .filter((slug) => aspectAllowedByModes(slug));
   }, [aspectAllowedByModes, aspects, basicsSelected, chosenAspects, overrideAll]);
 
-  // Keep Study always present in the Path
+  // Keep Study always present in the Grimoire
   useEffect(() => {
     if (!basicsSelected.includes(STUDY_SLUG)) {
       setBasicsSelected((prev) => Array.from(new Set([...prev, STUDY_SLUG])));
     }
   }, [basicsSelected]);
 
-  // Never allow Focus cards in the editable Path
+  // Keep Focus always present in the Grimoire
   useEffect(() => {
-    setEntries((prev) => {
-      let changed = false;
-      const next = { ...prev } as Record<string, number>;
-      for (const c of cards) {
-        if (c.aspect === FOCUS_SLUG && (next[c.id] || 0) > 0) {
-          next[c.id] = 0;
-          changed = true;
-        }
-      }
-      return changed ? next : prev;
-    });
-  }, [cards]);
+    if (!basicsSelected.includes(FOCUS_SLUG)) {
+      setBasicsSelected((prev) => Array.from(new Set([...prev, FOCUS_SLUG])));
+    }
+  }, [basicsSelected]);
 
   const modeRequirementHint = React.useCallback((slug: string) => {
     if (overrideAll) return undefined;
@@ -2217,8 +2208,8 @@ export default function App() {
   }
 
   function toggleBasic(slug: string) {
-    if (slug === FOCUS_SLUG) return; // Focus is fixed in the Grimoire, never toggled into Path
-    if (slug === STUDY_SLUG) return; // Study is always present in the Path
+    if (slug === FOCUS_SLUG) return; // Focus is fixed in the Grimoire
+    if (slug === STUDY_SLUG) return; // Study is always present in the Grimoire
     if (basicsSelected.includes(slug)) {
       setBasicsSelected((prev) => prev.filter((s) => s !== slug));
       clearAspectEntries(slug);
@@ -2392,7 +2383,7 @@ export default function App() {
     });
   }, [cardsById]);
 
-  // Auto-include all Study spells at Rank 2+ if none are present yet in the Path
+  // Auto-include all Study spells at Rank 2+ if none are present yet in the Grimoire
   useEffect(() => {
     if (rankCap < 2) return;
     const studyPresent = Object.entries(entries).some(
@@ -2416,6 +2407,20 @@ export default function App() {
     });
   }, [cards, cardsById, effectiveMaxCopies, entries, rankCap]);
 
+  // Default load: all Focus spells (fills the Grimoire to its base 60 pages)
+  useEffect(() => {
+    const hasAny = Object.values(entries).some((q) => (q || 0) > 0);
+    if (hasAny) return;
+    const focusList = cards.filter((c) => c.aspect === FOCUS_SLUG && !isReferenceCard(c));
+    if (focusList.length === 0) return;
+    const next: Record<string, number> = {};
+    for (const c of focusList) {
+      const max = Number(c.maxCopies || 0);
+      next[c.id] = max > 0 ? max : 1;
+    }
+    setEntries(next);
+  }, [cards, entries]);
+
   function setQty(cardId: string, n: number) {
     const card = cardsById[cardId];
     if (card && isReferenceCard(card)) {
@@ -2423,14 +2428,15 @@ export default function App() {
       return;
     }
     if (darkArtsActive && card?.type === 'Holy') {
-      alert('Dark Arts is active. Holy spells cannot be added to the Path.');
+      alert('Dark Arts is active. Holy spells cannot be added to the Grimoire.');
       setEntries((prev) => ({ ...prev, [cardId]: 0 }));
       return;
     }
     setEntries((prev) => ({ ...prev, [cardId]: Math.max(0, n) }));
   }
 
-  const pageLimit = 60;
+  const defaultPages = 60;
+  const pageLimit = Number.POSITIVE_INFINITY; // no hard cap
   const inkTarget = 75;
 
   const inkTotal = useMemo(() => {
@@ -2487,8 +2493,6 @@ export default function App() {
   }, [cardsById]);
 
   const currentDeckStats = useMemo(() => computeDeckUsageStats(entries), [computeDeckUsageStats, entries]);
-
-  const focusCards = useMemo(() => cards.filter((c) => c.aspect === FOCUS_SLUG), [cards]);
 
   // ----- Pre-Bound Grimoire Library -----
   const canUseGrimoire = useCallback((g: PreboundGrimoire) => {
@@ -2695,7 +2699,7 @@ export default function App() {
           if (n>0) { finalEntries[cid] = n; shadowLeft -= n; }
         }
       }
-      // Then allocate Holy/Light/Dark pages under per-type and total page caps
+      // Then allocate Holy/Light/Dark pages under per-type caps
       const addPage = (cid: string, maxAdd: number) => {
         const c = cardsById[cid]!;
         if (isReferenceCard(c)) return 0;
@@ -2992,10 +2996,7 @@ export default function App() {
       return `Adjust aspect selections to ${maxNonSpecialNext} before changing modes.`;
     }
 
-    const pageLimitNext = 60;
-    if (totalQty > pageLimitNext && !overrideAll) {
-      return `Reduce pages to ${pageLimitNext} before disabling this mode (currently ${totalQty}).`;
-    }
+    // No page cap enforcement in current ruleset
 
     const baseTypeLimitsNext: Partial<Record<SpellType, number>> = { Holy: 4, Light: 24, Dark: 2 };
     const darkModifierNext = includesDarkTrioNext;
@@ -3291,13 +3292,13 @@ export default function App() {
                       <div key={a.slug}>
                         {a.slug === FOCUS_SLUG ? (
                           <div className="rounded-2xl p-4 w-full text-center border border-slate-400 bg-slate-50 dark:bg-slate-800 dark:border-slate-600 shadow-sm">
-                            <div className="text-sm text-slate-500 dark:text-slate-400">Grimoire (fixed)</div>
+                            <div className="text-sm text-slate-500 dark:text-slate-400">Grimoire (default)</div>
                             <div className="text-base font-semibold">{a.name}</div>
-                            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">View-only in Grimoire</div>
+                            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">Starts loaded; removable in the list</div>
                           </div>
                         ) : a.slug === STUDY_SLUG ? (
                           <div className="rounded-2xl p-4 w-full text-center border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 dark:border-emerald-500 shadow-sm">
-                            <div className="text-sm text-emerald-700 dark:text-emerald-200">Path Core</div>
+                            <div className="text-sm text-emerald-700 dark:text-emerald-200">Core</div>
                             <div className="text-base font-semibold">{a.name}</div>
                             <div className="mt-1 text-xs text-emerald-700 dark:text-emerald-200">(Always included)</div>
                           </div>
@@ -3613,7 +3614,7 @@ export default function App() {
                                         if (locked) continue;
                                         if (darkArtsActive && card.type === 'Holy') {
                                           if (!holyBlockedAlerted) {
-                                            alert('Dark Arts is active. Holy spells cannot be added to the Path.');
+                                            alert('Dark Arts is active. Holy spells cannot be added to the Grimoire.');
                                             holyBlockedAlerted = true;
                                           }
                                           next[card.id] = 0;
@@ -3706,64 +3707,21 @@ export default function App() {
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold mb-2 text-center">Grimoire</h3>
               <div className="flex items-center justify-center gap-6 text-sm font-medium mb-2">
-                <span>Pages: {totalQty}/{pageLimit}</span>
+                <span>Pages: {totalQty}</span>
                 <span className={inkTotal === inkTarget ? undefined : 'text-red-600 font-semibold'}>
                   INK: {inkTotal}/{inkTarget}
                 </span>
               </div>
               <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
-                <span className="block">Focus is always available in the Grimoire and cannot be edited here.</span>
-                <span className="block">Grimoire uses a 60-page cap during play.</span>
-              </div>
-              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 p-3">
-                {focusCards.length > 0 ? (
-                  <div className="space-y-3">
-                    {(['Holy','Light','Dark','Curse','Travel','Info','Astral','Shadow'] as SpellType[]).map((t) => {
-                      const group = focusCards
-                        .filter((c) => c.type === t)
-                        .slice()
-                        .sort((a, b) => a.name.localeCompare(b.name));
-                      if (group.length === 0) return null;
-                      const total = group.length;
-                      return (
-                        <details key={t} className="rounded-lg border border-slate-300 dark:border-slate-700">
-                          <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg">
-                            <span className="font-semibold">[{t}]</span>
-                            <span className="text-sm text-slate-600 dark:text-slate-300">{total} spell{total===1?'':'s'}</span>
-                          </summary>
-                          <div className="p-3">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                              {group.map((c) => (
-                                <button
-                                  key={c.id}
-                                  type="button"
-                                  className="flex w-full items-center justify-between gap-3 rounded px-3 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-100 dark:focus-visible:ring-offset-slate-900"
-                                  onClick={() => { prefetchCardImage(c.id, 0); setPreviewCard(c); }}
-                                  onMouseEnter={() => prefetchCardImage(c.id, 1)}
-                                  onFocus={() => prefetchCardImage(c.id, 1)}
-                                >
-                                  <span className="font-semibold text-indigo-700 dark:text-indigo-200 underline decoration-2 decoration-indigo-400 dark:decoration-indigo-300 underline-offset-2">
-                                    {c.name}
-                                  </span>
-                                  <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap">R{c.rank} · x{c.maxCopies}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </details>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-sm text-center text-slate-500">Focus cards unavailable.</div>
-                )}
+                <span className="block">Focus spells start loaded; remove any to make room for other spells.</span>
+                <span className="block">Default load: {defaultPages} Focus spells. Remove cards to tailor your Grimoire.</span>
               </div>
             </div>
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
-              <h3 className="font-semibold mb-2 text-center">Path Summary:</h3>
+              <h3 className="font-semibold mb-2 text-center">Grimoire Summary:</h3>
               <div className="text-center font-mono whitespace-pre-wrap">
-                <div className="text-lg">{totalCopies} Spells in Path</div>
+                <div className="text-lg">{totalCopies} Spells in Grimoire</div>
                 <div className="flex items-center justify-center gap-6">
                   <span className={capAttempt === 'Holy' ? 'text-red-600 font-bold' : undefined}>
                     [Holy]: {counts.Holy}{darkArtsActive ? ' (blocked)' : ''}{'\u00A0\u00A0\u00A0'}
@@ -3778,7 +3736,7 @@ export default function App() {
                 {(hasAstral || hasShadow) && (
                   <div className="mt-1 text-sm">{extraSummaryLine}</div>
                 )}
-                <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Copy limits apply. Page cap: {pageLimit}.</div>
+                <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Copy limits apply. Deck is valid at INK 75.</div>
                 <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Type caps: Holy {TYPE_LIMITS.Holy} · Light {TYPE_LIMITS.Light} · Dark {TYPE_LIMITS.Dark}</div>
                 {darkArtsActive && (
                   <div className="mt-1 text-sm text-red-600 font-semibold">
@@ -3790,11 +3748,11 @@ export default function App() {
             </div>
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
-              <h3 className="font-semibold mb-3 text-center">Path of Spells</h3>
+              <h3 className="font-semibold mb-3 text-center">Grimoire Contents</h3>
               <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
-                <span className="block">All non-Focus spells live here. </span>
+                <span className="block">All selected spells live here.</span>
                 <span className="block">Study is always included.</span>
-                <span className="block">Add up to {darkArtsActive ? '3' : '2'} additional aspects (copy limits; {pageLimit}-page cap).</span>
+                <span className="block">Add up to {darkArtsActive ? '3' : '2'} additional aspects (copy limits only).</span>
               </div>
               {(() => {
                 const expanded = Object.entries(entries)
@@ -3846,7 +3804,7 @@ export default function App() {
                       );
                     })}
                     {types.filter(shouldShow).every(t => expanded.filter(x=>x.card.type===t).length===0) && (
-                      <div className="text-sm text-center text-slate-500">No spells chosen for the Path yet.</div>
+                      <div className="text-sm text-center text-slate-500">No spells chosen yet.</div>
                     )}
                   </div>
                 );
@@ -4336,7 +4294,7 @@ export default function App() {
                     <label className="block text-sm">Source</label>
                     <div className="rounded-lg border border-slate-300 dark:border-slate-700 p-3 bg-white/60 dark:bg-slate-900/40">
                       <div className="text-sm flex flex-wrap items-center gap-3">
-                        <span>Current Path:</span>
+                        <span>Current Grimoire:</span>
                         <span className="font-mono">{currentDeckStats.total} spells</span>
                         <span className="font-mono">[H {counts.Holy}] [L {counts.Light}] [D {counts.Dark}]</span>
                       </div>
