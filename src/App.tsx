@@ -1990,7 +1990,7 @@ export default function App() {
     return `Enable ${toggleLabel} in Game Mode Toggles before selecting this Aspect.`;
   }, [aspectAllowedByModes, overrideAll, unlocksSet]);
 
-  // Min rank per aspect and eligibility against current cap
+  // Min rank per aspect and eligibility (rank cap no longer used)
   const MIN_RANK_BY_ASPECT = useMemo(() => {
     const map: Record<string, number> = {};
     for (const c of cards) {
@@ -2001,8 +2001,8 @@ export default function App() {
   }, [cards]);
   const aspectEligible = React.useCallback((slug: string) => {
     const min = MIN_RANK_BY_ASPECT[slug];
-    return Number.isFinite(min) && (min as number) <= rankCap;
-  }, [MIN_RANK_BY_ASPECT, rankCap]);
+    return Number.isFinite(min);
+  }, [MIN_RANK_BY_ASPECT]);
 
   // Derived from data
   const ASPECT_INDEX = useMemo(() => {
@@ -2293,7 +2293,6 @@ export default function App() {
     return cards
       .filter((c) => selectedAspectSlugs.includes(c.aspect))
       .filter((c) => parallelModeActive || !PARALLEL_CARD_IDS.has(c.id))
-      .filter((c) => c.rank <= rankCap)
       .map((c) => ({ ...c, maxCopies: effectiveMaxCopies[c.id] ?? c.maxCopies }))
       .sort((a, b) => {
         // Aspect order fixed at top of list
@@ -2312,7 +2311,7 @@ export default function App() {
       // Name desc
       return b.name.localeCompare(a.name);
     });
-  }, [ASPECT_INDEX, cards, effectiveMaxCopies, parallelModeActive, rankCap, selectedAspectSlugs]);
+  }, [ASPECT_INDEX, cards, effectiveMaxCopies, parallelModeActive, selectedAspectSlugs]);
 
   const groupedByAspect = useMemo(() => {
     const map: Record<string, Card[]> = {};
@@ -2392,30 +2391,6 @@ export default function App() {
       return changed ? next : prev;
     });
   }, [cardsById]);
-
-  // Auto-include all Study spells at Rank 2+ if none are present yet in the Grimoire
-  useEffect(() => {
-    if (rankCap < 2) return;
-    const studyPresent = Object.entries(entries).some(
-      ([id, qty]) => (qty || 0) > 0 && cardsById[id]?.aspect === STUDY_SLUG
-    );
-    if (studyPresent) return;
-    const studyCards = cards.filter((c) => c.aspect === STUDY_SLUG && c.rank <= rankCap && !isReferenceCard(c));
-    if (studyCards.length === 0) return;
-    setEntries((prev) => {
-      const next: Record<string, number> = { ...prev };
-      let changed = false;
-      for (const c of studyCards) {
-        const current = next[c.id] || 0;
-        const target = Math.max(current, effectiveMaxCopies[c.id] ?? c.maxCopies);
-        if (target !== current) {
-          next[c.id] = target;
-          changed = true;
-        }
-      }
-      return changed ? next : prev;
-    });
-  }, [cards, cardsById, effectiveMaxCopies, entries, rankCap]);
 
   // Default load: all Focus spells (fills the Grimoire to its base 60 pages)
   useEffect(() => {
@@ -2613,24 +2588,6 @@ export default function App() {
     const baseBasics = basicReq.length > 0 ? basicReq : ['focus'];
     setBasicsSelected(Array.from(new Set(baseBasics)));
     setChosenAspects(Array.from(new Set(nonBasicReq)));
-    // Ensure rank shows all cards in template (support "id:count" and object forms)
-    const ranks: number[] = [];
-    for (const raw of (g.spellCards || [])) {
-      let id: string | undefined;
-      if (typeof raw === 'string') {
-        const m = raw.split(':');
-        id = (m[0] || '').trim();
-      } else if (raw && typeof raw === 'object') {
-        id = (raw as any).id;
-      }
-      const cid = resolveId(id);
-      if (!cid) continue;
-      const card = cardsById[cid];
-      if (card) ranks.push(card.rank);
-    }
-    const maxRank = ranks.length > 0 ? Math.max(...ranks) : rankCap;
-    if (maxRank !== rankCap) setRankCap(maxRank);
-
     // Two-phase apply: 1) enable required modifiers, 2) fill under caps
     try {
       const targetMastery = false;
@@ -2756,7 +2713,7 @@ export default function App() {
       }
     } catch {}
     setShowLibrary(false);
-  }, [TYPE_LIMITS, cards, canUseGrimoire, isBasicAspect, pageLimit, rankCap]);
+  }, [TYPE_LIMITS, cards, canUseGrimoire, isBasicAspect, pageLimit]);
 
   // Admin helpers for Pre-Bound Grimoires
   const slugify = useCallback((s: string) => (s||'')
@@ -3914,7 +3871,6 @@ export default function App() {
                 })
                 .filter(g => canUseGrimoire(g))
                 .map(g => ({ g, meta: expandGrimoire(g) }))
-                .filter(({meta}) => meta.maxRank <= rankCap)
                 .filter(({meta}) => !fragmentsModeActive || meta.fragmentsOk);
               if (eligible.length===0) {
                 return <div className="text-sm text-center text-slate-500">No Pre-Bound Grimoires are available with your current unlocks.</div>;
