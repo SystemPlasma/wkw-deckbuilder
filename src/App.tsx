@@ -1911,8 +1911,9 @@ export default function App() {
     setCapAttempt(t);
     capTimer.current = window.setTimeout(() => setCapAttempt(null), 1500);
   };
-  const [spellSort, setSpellSort] = useState<'alpha' | 'ink' | 'copies' | 'type'>('alpha');
+  const [spellSort, setSpellSort] = useState<'alpha' | 'ink' | 'copies'>('alpha');
   const [spellSortDir, setSpellSortDir] = useState<'asc' | 'desc'>('asc');
+  const [groupByType, setGroupByType] = useState(false);
   const [overrideAll, setOverrideAll] = useState(false);
   // Rank filter: show only cards with rank <= cap
   const [rankCap, setRankCap] = useState<number>(99);
@@ -3560,7 +3561,6 @@ export default function App() {
                 { id: 'alpha', label: 'Alphabetical' },
                 { id: 'ink', label: 'INK Cost' },
                 { id: 'copies', label: 'Max Copies' },
-                { id: 'type', label: 'Type' },
               ] as const).map((opt) => (
                 <button
                   key={opt.id}
@@ -3576,6 +3576,19 @@ export default function App() {
                   {opt.label}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => setGroupByType((v) => !v)}
+                className={[
+                  "px-3 py-1 rounded-md text-sm border shadow-sm",
+                  groupByType
+                    ? "bg-indigo-100 text-indigo-800 border-indigo-300"
+                    : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700",
+                ].join(' ')}
+                aria-pressed={groupByType}
+              >
+                Type
+              </button>
               <button
                 type="button"
                 onClick={() => setSpellSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
@@ -3638,17 +3651,13 @@ export default function App() {
                 };
                 const isPinned = (c: Card) => c.type === 'Info' || c.type === 'Travel';
                 const pinOrder = (c: Card) => (c.type === 'Info' ? 0 : 1);
-                const sortNameWithDir = (a: Card, b: Card) => {
-                  const diff = a.name.localeCompare(b.name);
-                  return spellSortDir === 'asc' ? diff : -diff;
-                };
                 const pinnedCards = [...group.cards]
                   .filter(isPinned)
                   .sort((a, b) => {
                     const pa = pinOrder(a);
                     const pb = pinOrder(b);
                     if (pa !== pb) return pa - pb;
-                    return sortNameWithDir(a, b);
+                    return compareBySort(a, b);
                   });
                 const otherCards = [...group.cards].filter((c) => !isPinned(c)).sort(compareBySort);
                 return (
@@ -3779,7 +3788,7 @@ export default function App() {
                             );
                           })()}
                         </div>
-                        {spellSort === 'type' ? (
+                        {groupByType ? (
                           <div className="space-y-3">
                             {pinnedCards.length > 0 && (
                               <details className="rounded-lg border border-slate-300 dark:border-slate-700" open>
@@ -3793,7 +3802,7 @@ export default function App() {
                               </details>
                             )}
                             {(['Holy', 'Light', 'Dark', 'Astral', 'Shadow'] as SpellType[]).map((t) => {
-                              const list = otherCards.filter((c) => c.type === t).sort(sortNameWithDir);
+                              const list = otherCards.filter((c) => c.type === t).sort(compareBySort);
                               if (list.length === 0) return null;
                               return (
                                 <details key={t} className="rounded-lg border border-slate-300 dark:border-slate-700" open>
