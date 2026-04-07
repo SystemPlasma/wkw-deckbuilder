@@ -494,8 +494,7 @@ function renderAdditionalLostAspect(args: AdditionalGroupRenderArgs) {
     .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
   const nextSet = new Set([...nonSpecialSelected, aspect.slug]);
   const nextCount = nextSet.size;
-  const nextIsExactDarkTrio = (DARK_SLUGS as readonly string[]).every((s) => nextSet.has(s)) && nextSet.size === (DARK_SLUGS as readonly string[]).length;
-  const disabled = modeLocked || (!overrideAll && !isSelected && !(nextCount <= maxNonSpecialAllowed || nextIsExactDarkTrio));
+  const disabled = modeLocked || (!overrideAll && !isSelected && nextCount > maxNonSpecialAllowed);
   const label = aspectDisplayName(aspect, unlocked);
   const labelWithIndicator = isSelected ? `${label} · 1 selected` : label;
 
@@ -611,8 +610,7 @@ function renderAdditionalGroup(args: AdditionalGroupListArgs) {
               .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
             const nextSet = new Set([...nonSpecialSelected, a.slug]);
             const nextCount = nextSet.size;
-            const nextIsExactDarkTrio = (DARK_SLUGS as readonly string[]).every((s) => nextSet.has(s)) && nextSet.size === (DARK_SLUGS as readonly string[]).length;
-            const disabled = modeLocked || (!overrideAll && !isSelected && !(nextCount <= maxNonSpecialAllowed || nextIsExactDarkTrio));
+            const disabled = modeLocked || (!overrideAll && !isSelected && nextCount > maxNonSpecialAllowed);
             return (
               <AspectCard
                 key={a.slug}
@@ -2052,7 +2050,7 @@ export default function App() {
     return (DARK_SLUGS as readonly string[]).every((s) => set.has(s));
   })();
   const darkArtsActive = allDarkTrioSelected;
-  const maxNonSpecialAllowed = darkArtsActive ? 3 : 2;
+  const maxNonSpecialAllowed = overrideAll ? 99 : 2;
 
   // Enforce Dark Arts restriction by clearing any [Holy] spells when all three Dark aspects are selected
   useEffect(() => {
@@ -2262,8 +2260,7 @@ export default function App() {
     const nextSet = new Set([...nonSpecialSelected, slug]);
     const nextCount = nextSet.size;
     const darkTrioSlugs = DARK_SLUGS as readonly string[];
-    const nextIsExactDarkTrio = darkTrioSlugs.every((s) => nextSet.has(s)) && nextSet.size === darkTrioSlugs.length;
-    if (nextCount > maxNonSpecialAllowed && !nextIsExactDarkTrio) return;
+    if (nextCount > maxNonSpecialAllowed) return;
     setChosenAspects(Array.from(new Set([...chosenAspects, slug])));
 
     // total >= 3 → already at max; do nothing
@@ -3137,13 +3134,28 @@ export default function App() {
   const SPECIAL_SLUGS = useMemo(() => aspects.filter(a => a.isSpecial).map(a => a.slug) as ReadonlyArray<string>, [aspects]);
   const darkSelectedCount = chosenAspects.filter((slug) => DARK_SLUGS.includes(slug)).length;
   const specialSelectedCount = chosenAspects.filter((slug) => SPECIAL_SLUGS.includes(slug)).length;
-  const additionalSelectedCount = chosenAspects.filter((slug) => {
+  const additionalSelectedSlugs = useMemo(() => chosenAspects.filter((slug) => {
     const meta = aspectsBySlug[slug];
     if (!meta) return false;
     if (isBasicAspect(slug)) return false;
     if (meta.isSpecial || meta.isDark) return false;
     return true;
-  }).length;
+  }), [chosenAspects, aspectsBySlug, isBasicAspect]);
+  const additionalSelectedCount = additionalSelectedSlugs.length;
+  const travelMpByAspect = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const c of cards) {
+      if (c.type !== 'Travel') continue;
+      const cost = Number(c.rank || 0);
+      if (!Number.isFinite(cost)) continue;
+      if (map[c.aspect] == null || cost < map[c.aspect]) map[c.aspect] = cost;
+    }
+    return map;
+  }, [cards]);
+  const totalTravelMp = useMemo(
+    () => additionalSelectedSlugs.reduce((sum, slug) => sum + (travelMpByAspect[slug] || 0), 0),
+    [additionalSelectedSlugs, travelMpByAspect]
+  );
   const hasAdditionalUnlocked = Boolean(
     (additionalLostAspect && (overrideAll || unlocksSet.has(additionalLostAspect.slug))) ||
     additionalAspectGroups.some(group => group.some(a => overrideAll || unlocksSet.has(a.slug)))
@@ -3327,14 +3339,11 @@ export default function App() {
                           .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
                         const nextSet = new Set([...nonSpecialSelected, a.slug]);
                         const nextCount = nextSet.size;
-                        const darkTrioSlugs = DARK_SLUGS as readonly string[];
-                        const formsDarkTrioNext = darkTrioSlugs.every((s) => nextSet.has(s));
-                        const exactlyDarkTrioNext = formsDarkTrioNext && nextSet.size === darkTrioSlugs.length;
                         let disabled = false;
                         if (modeLocked) {
                           disabled = true;
                         } else if (!overrideAll && !isSelected) {
-                          const permitted = nextCount <= maxNonSpecialAllowed || exactlyDarkTrioNext;
+                          const permitted = nextCount <= maxNonSpecialAllowed;
                           disabled = !permitted;
                         }
                         return (
@@ -3473,9 +3482,7 @@ export default function App() {
                 {additionalSelectedCount > 0 ? ` · ${additionalSelectedCount} selected` : ''}
               </h2>
               <div className="text-sm text-slate-600 dark:text-slate-300">
-                {showDarkCategory
-                  ? `(choose up to ${maxNonSpecialAllowed} — all 3 Dark Arts still allowed)`
-                  : `(choose up to ${maxNonSpecialAllowed})`}
+                Total [Travel] MP: {totalTravelMp}
               </div>
             </div>
 
