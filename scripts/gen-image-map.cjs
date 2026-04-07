@@ -83,7 +83,7 @@ function main() {
   for (const id of ids) {
     if (obfManifest && obfManifest[id] && obfManifest[id].file) {
       // Obfuscated entry points to public path; no import necessary in TS map
-      entries.push({ id, obfFile: obfManifest[id].file });
+      entries.push({ id, obfFile: obfManifest[id].file, mime: obfManifest[id].mime });
       continue;
     }
     let found = null;
@@ -106,14 +106,25 @@ function main() {
     const safe = /^[A-Za-z_]/.test(base) ? base : `_${base}`;
     return `IMG_${safe}`;
   };
+  const extToMime = (ext) => {
+    const e = (ext || '').toLowerCase();
+    if (e === 'jpg' || e === 'jpeg') return 'image/jpeg';
+    if (e === 'svg') return 'image/svg+xml';
+    return 'image/png';
+  };
+
   let lines;
   if (obfManifest) {
     // Map directly to public obfuscated URLs. No ".png" strings in JS, only ".bin".
     const mapLines = entries.map((e) => `  '${e.id}': '/assets/obf/${e.obfFile}',`);
+    const mimeLines = entries.map((e) => `  '${e.id}': '${e.mime || 'image/png'}',`);
     lines = [
       header,
       `export const CARD_IMAGE_URLS: Record<string, string> = {`,
       ...mapLines,
+      `};`,
+      `export const CARD_IMAGE_MIME: Record<string, string> = {`,
+      ...mimeLines,
       `};`,
       `export default CARD_IMAGE_URLS;`,
       ``,
@@ -125,12 +136,16 @@ function main() {
       return `import ${v} from '${rel}/${cand}.${ext}';`;
     });
     const mapLines = entries.map(({ id }) => `  '${id}': ${toVar(id)},`);
+    const mimeLines = entries.map(({ id, ext }) => `  '${id}': '${extToMime(ext)}',`);
     lines = [
       header,
       ...importLines,
       '',
       `export const CARD_IMAGE_URLS: Record<string, string> = {`,
       ...mapLines,
+      `};`,
+      `export const CARD_IMAGE_MIME: Record<string, string> = {`,
+      ...mimeLines,
       `};`,
       `export default CARD_IMAGE_URLS;`,
       ``,
