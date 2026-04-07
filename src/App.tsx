@@ -1911,7 +1911,7 @@ export default function App() {
     setCapAttempt(t);
     capTimer.current = window.setTimeout(() => setCapAttempt(null), 1500);
   };
-  const [spellSort, setSpellSort] = useState<'alpha' | 'ink' | 'copies'>('alpha');
+  const [spellSort, setSpellSort] = useState<'alpha' | 'ink' | 'copies' | 'type'>('alpha');
   const [spellSortDir, setSpellSortDir] = useState<'asc' | 'desc'>('asc');
   const [overrideAll, setOverrideAll] = useState(false);
   // Rank filter: show only cards with rank <= cap
@@ -3560,6 +3560,7 @@ export default function App() {
                 { id: 'alpha', label: 'Alphabetical' },
                 { id: 'ink', label: 'INK Cost' },
                 { id: 'copies', label: 'Max Copies' },
+                { id: 'type', label: 'Type' },
               ] as const).map((opt) => (
                 <button
                   key={opt.id}
@@ -3593,6 +3594,28 @@ export default function App() {
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
                 const collapsed = collapsedGroups[group.slug] ?? false;
+                const renderCardRows = (cardsList: Card[]) => (
+                  <div className="divide-y px-3 md:px-5 lg:px-7 max-w-xl mx-auto rounded-2xl">
+                    {cardsList.map((card) => {
+                      const qty = entries[card.id] || 0;
+                      const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
+                      return (
+                        <CardRow
+                          key={card.id}
+                          card={card}
+                          qty={qty}
+                          locked={locked}
+                          readOnly={isReferenceCard(card)}
+                          onChange={(n) => setQty(card.id, n)}
+                          onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
+                          remainingSlots={Math.max(0, pageLimit - totalQty)}
+                          remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
+                          onCapAttempt={showCapAttempt}
+                        />
+                      );
+                    })}
+                  </div>
+                );
                 const compareBySort = (a: Card, b: Card) => {
                   if (spellSort === 'alpha') {
                     const diff = a.name.localeCompare(b.name);
@@ -3615,13 +3638,17 @@ export default function App() {
                 };
                 const isPinned = (c: Card) => c.type === 'Info' || c.type === 'Travel';
                 const pinOrder = (c: Card) => (c.type === 'Info' ? 0 : 1);
+                const sortNameWithDir = (a: Card, b: Card) => {
+                  const diff = a.name.localeCompare(b.name);
+                  return spellSortDir === 'asc' ? diff : -diff;
+                };
                 const pinnedCards = [...group.cards]
                   .filter(isPinned)
                   .sort((a, b) => {
                     const pa = pinOrder(a);
                     const pb = pinOrder(b);
                     if (pa !== pb) return pa - pb;
-                    return a.name.localeCompare(b.name);
+                    return sortNameWithDir(a, b);
                   });
                 const otherCards = [...group.cards].filter((c) => !isPinned(c)).sort(compareBySort);
                 return (
@@ -3752,47 +3779,78 @@ export default function App() {
                             );
                           })()}
                         </div>
-                        <div className="divide-y px-3 md:px-5 lg:px-7 max-w-xl mx-auto rounded-2xl">
-                          {pinnedCards.map((card) => {
-                            const qty = entries[card.id] || 0;
-                            const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
-                            return (
-                              <CardRow
-                                key={card.id}
-                                card={card}
-                                qty={qty}
-                                locked={locked}
-                                readOnly={isReferenceCard(card)}
-                                onChange={(n) => setQty(card.id, n)}
-                                onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
-                                remainingSlots={Math.max(0, pageLimit - totalQty)}
-                                remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
-                                onCapAttempt={showCapAttempt}
-                              />
-                            );
-                          })}
-                          {pinnedCards.length > 0 && otherCards.length > 0 && (
-                            <div className="border-t-2 border-slate-400 dark:border-slate-600 my-2" />
-                          )}
-                          {otherCards.map((card) => {
-                            const qty = entries[card.id] || 0;
-                            const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
-                            return (
-                              <CardRow
-                                key={card.id}
-                                card={card}
-                                qty={qty}
-                                locked={locked}
-                                readOnly={isReferenceCard(card)}
-                                onChange={(n) => setQty(card.id, n)}
-                                onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
-                                remainingSlots={Math.max(0, pageLimit - totalQty)}
-                                remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
-                                onCapAttempt={showCapAttempt}
-                              />
-                            );
-                          })}
-                        </div>
+                        {spellSort === 'type' ? (
+                          <div className="space-y-3">
+                            {pinnedCards.length > 0 && (
+                              <details className="rounded-lg border border-slate-300 dark:border-slate-700" open>
+                                <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg">
+                                  <span className="font-semibold">Pinned (Info + Travel)</span>
+                                  <span className="text-sm text-slate-600 dark:text-slate-300">{pinnedCards.length}</span>
+                                </summary>
+                                <div className="p-2">
+                                  {renderCardRows(pinnedCards)}
+                                </div>
+                              </details>
+                            )}
+                            {(['Holy', 'Light', 'Dark', 'Astral', 'Shadow'] as SpellType[]).map((t) => {
+                              const list = otherCards.filter((c) => c.type === t).sort(sortNameWithDir);
+                              if (list.length === 0) return null;
+                              return (
+                                <details key={t} className="rounded-lg border border-slate-300 dark:border-slate-700" open>
+                                  <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg">
+                                    <span className="font-semibold">[{t}]</span>
+                                    <span className="text-sm text-slate-600 dark:text-slate-300">{list.length}</span>
+                                  </summary>
+                                  <div className="p-2">
+                                    {renderCardRows(list)}
+                                  </div>
+                                </details>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="divide-y px-3 md:px-5 lg:px-7 max-w-xl mx-auto rounded-2xl">
+                            {pinnedCards.map((card) => {
+                              const qty = entries[card.id] || 0;
+                              const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
+                              return (
+                                <CardRow
+                                  key={card.id}
+                                  card={card}
+                                  qty={qty}
+                                  locked={locked}
+                                  readOnly={isReferenceCard(card)}
+                                  onChange={(n) => setQty(card.id, n)}
+                                  onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
+                                  remainingSlots={Math.max(0, pageLimit - totalQty)}
+                                  remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
+                                  onCapAttempt={showCapAttempt}
+                                />
+                              );
+                            })}
+                            {pinnedCards.length > 0 && otherCards.length > 0 && (
+                              <div className="border-t-2 border-slate-400 dark:border-slate-600 my-2" />
+                            )}
+                            {otherCards.map((card) => {
+                              const qty = entries[card.id] || 0;
+                              const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
+                              return (
+                                <CardRow
+                                  key={card.id}
+                                  card={card}
+                                  qty={qty}
+                                  locked={locked}
+                                  readOnly={isReferenceCard(card)}
+                                  onChange={(n) => setQty(card.id, n)}
+                                  onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
+                                  remainingSlots={Math.max(0, pageLimit - totalQty)}
+                                  remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
+                                  onCapAttempt={showCapAttempt}
+                                />
+                              );
+                            })}
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
