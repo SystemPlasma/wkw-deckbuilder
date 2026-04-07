@@ -3541,7 +3541,7 @@ export default function App() {
               {([
                 { id: 'alpha', label: 'Alphabetical' },
                 { id: 'ink', label: 'INK Cost' },
-                { id: 'copies', label: '# of Copies' },
+                { id: 'copies', label: 'Max Copies' },
               ] as const).map((opt) => (
                 <button
                   key={opt.id}
@@ -3573,11 +3573,7 @@ export default function App() {
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
                 const collapsed = collapsedGroups[group.slug] ?? false;
-                const sortedCards = [...group.cards].sort((a, b) => {
-                  const typeBucket = (c: Card) => (c.type === 'Info' ? 0 : c.type === 'Travel' ? 1 : 2);
-                  const ta = typeBucket(a);
-                  const tb = typeBucket(b);
-                  if (ta !== tb) return ta - tb;
+                const compareBySort = (a: Card, b: Card) => {
                   if (spellSort === 'alpha') {
                     const diff = a.name.localeCompare(b.name);
                     return spellSortDir === 'asc' ? diff : -diff;
@@ -3588,15 +3584,26 @@ export default function App() {
                     const nameDiff = a.name.localeCompare(b.name);
                     return spellSortDir === 'asc' ? nameDiff : -nameDiff;
                   }
-                  const qa = entries[a.id] || 0;
-                  const qb = entries[b.id] || 0;
+                  const qa = a.maxCopies || 0;
+                  const qb = b.maxCopies || 0;
                   if (qb !== qa) {
                     const diff = qb - qa;
                     return spellSortDir === 'asc' ? diff : -diff;
                   }
                   const nameDiff = a.name.localeCompare(b.name);
                   return spellSortDir === 'asc' ? nameDiff : -nameDiff;
-                });
+                };
+                const isPinned = (c: Card) => c.type === 'Info' || c.type === 'Travel';
+                const pinOrder = (c: Card) => (c.type === 'Info' ? 0 : 1);
+                const pinnedCards = [...group.cards]
+                  .filter(isPinned)
+                  .sort((a, b) => {
+                    const pa = pinOrder(a);
+                    const pb = pinOrder(b);
+                    if (pa !== pb) return pa - pb;
+                    return a.name.localeCompare(b.name);
+                  });
+                const otherCards = [...group.cards].filter((c) => !isPinned(c)).sort(compareBySort);
                 return (
                   <div key={group.slug} className="rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 p-3">
                     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -3725,7 +3732,28 @@ export default function App() {
                           })()}
                         </div>
                         <div className="divide-y px-3 md:px-5 lg:px-7 max-w-xl mx-auto rounded-2xl">
-                          {sortedCards.map((card) => {
+                          {pinnedCards.map((card) => {
+                            const qty = entries[card.id] || 0;
+                            const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
+                            return (
+                              <CardRow
+                                key={card.id}
+                                card={card}
+                                qty={qty}
+                                locked={locked}
+                                readOnly={isReferenceCard(card)}
+                                onChange={(n) => setQty(card.id, n)}
+                                onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
+                                remainingSlots={Math.max(0, pageLimit - totalQty)}
+                                remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
+                                onCapAttempt={showCapAttempt}
+                              />
+                            );
+                          })}
+                          {pinnedCards.length > 0 && otherCards.length > 0 && (
+                            <div className="border-t-2 border-slate-400 dark:border-slate-600 my-2" />
+                          )}
+                          {otherCards.map((card) => {
                             const qty = entries[card.id] || 0;
                             const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
                             return (
