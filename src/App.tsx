@@ -3308,13 +3308,7 @@ export default function App() {
                     .sort((a, b) => (ASPECT_INDEX[a.slug] ?? 999) - (ASPECT_INDEX[b.slug] ?? 999))
                     .map((a) => (
                       <div key={a.slug}>
-                        {a.slug === FOCUS_SLUG ? (
-                          <div className="rounded-2xl p-4 w-full text-center border border-slate-400 bg-slate-50 dark:bg-slate-800 dark:border-slate-600 shadow-sm">
-                            <div className="text-sm text-slate-500 dark:text-slate-400">Grimoire (default)</div>
-                            <div className="text-base font-semibold">{a.name}</div>
-                            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">Starts loaded; removable in the list</div>
-                          </div>
-                        ) : a.slug === STUDY_SLUG ? (
+                        {a.slug === STUDY_SLUG ? (
                           <div className="rounded-2xl p-4 w-full text-center border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 dark:border-emerald-500 shadow-sm">
                             <div className="text-sm text-emerald-700 dark:text-emerald-200">Core</div>
                             <div className="text-base font-semibold">{a.name}</div>
@@ -3563,7 +3557,7 @@ export default function App() {
         {/* Cards grouped by Aspect */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
-            <h3 className="font-semibold mb-2 text-center">Cards (from selected Aspects)</h3>
+            <h3 className="font-semibold mb-2 text-center">Spell Pages</h3>
             {/* Sort by role removed per request; keeping only role filter below */}
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
