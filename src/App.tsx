@@ -742,9 +742,12 @@ function AspectCard({
         {unlocked ? (
           <>
             <div className="text-sm text-slate-500 dark:text-slate-400">
-              {aspect.isBasic ? "Basics" : aspect.isSpecial ? "Special" : aspect.isDark ? "Dark Art" : "Aspect"}
+              {aspect.isBasic ? "Core" : aspect.isSpecial ? "Special" : aspect.isDark ? "Dark Art" : "Aspect"}
             </div>
             <div className="text-base font-semibold">{aspect.name}</div>
+            {aspect.isBasic && (
+              <div className="text-xs text-slate-500 dark:text-slate-400">Always Included</div>
+            )}
           </>
         ) : (
           <div className="text-base font-semibold">Locked</div>
@@ -3311,10 +3314,10 @@ export default function App() {
                     .map((a) => (
                       <div key={a.slug}>
                         {a.slug === STUDY_SLUG ? (
-                          <div className="rounded-2xl p-4 w-full text-center border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 dark:border-emerald-500 shadow-sm">
-                            <div className="text-sm text-emerald-700 dark:text-emerald-200">Core</div>
-                            <div className="text-base font-semibold">{a.name}</div>
-                            <div className="mt-1 text-xs text-emerald-700 dark:text-emerald-200">(Always included)</div>
+                            <div className="rounded-2xl p-4 w-full text-center border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 dark:border-emerald-500 shadow-sm">
+                              <div className="text-sm text-emerald-700 dark:text-emerald-200">Core</div>
+                              <div className="text-base font-semibold">{a.name}</div>
+                            <div className="mt-1 text-xs text-emerald-700 dark:text-emerald-200">Always Included</div>
                           </div>
                         ) : (
                           <AspectCard
