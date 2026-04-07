@@ -56,13 +56,6 @@ function resolveCardImageUrl(id: string): string | undefined {
     return match?.[1] || 'png';
   };
 
-  // If our image map has an entry, it already points at the bundler-managed URL.
-  // Return it directly so we preserve hashed filenames in production builds.
-  if (mapped) return mapped;
-
-  const extension = guessExtension(mapped);
-  const relativePath = `assets/cards/${id}.${extension}`;
-
   const baseFromEnv = (((import.meta as any)?.env?.BASE_URL) || '/') as string;
   let normalizedBase = baseFromEnv.endsWith('/') ? baseFromEnv : `${baseFromEnv}/`;
   if (!normalizedBase.startsWith('/')) normalizedBase = `/${normalizedBase}`;
@@ -70,6 +63,18 @@ function resolveCardImageUrl(id: string): string | undefined {
     normalizedBase = normalizedBase.replace(/assets\/?$/, '');
     if (!normalizedBase.endsWith('/')) normalizedBase += '/';
   }
+
+  // If our image map has an entry, normalize it for GitHub Pages base path.
+  if (mapped) {
+    if (/^(https?:|blob:|data:)/i.test(mapped)) return mapped;
+    if (mapped.startsWith('/assets/')) {
+      return `${normalizedBase}${mapped.replace(/^\/+/, '')}`;
+    }
+    return mapped;
+  }
+
+  const extension = guessExtension(mapped);
+  const relativePath = `assets/cards/${id}.${extension}`;
 
   const buildAbsolute = () => {
     const sanitized = relativePath.replace(/^[./]+/, '');
