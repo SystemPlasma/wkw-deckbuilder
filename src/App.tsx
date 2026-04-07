@@ -2319,7 +2319,7 @@ export default function App() {
       const valid = new Set(groupedByAspect.map((g) => g.slug));
       const next: Record<string, boolean> = {};
       for (const slug of valid) {
-        if (prev[slug]) next[slug] = true;
+        next[slug] = prev[slug] ?? true;
       }
       return next;
     });
