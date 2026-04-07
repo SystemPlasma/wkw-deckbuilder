@@ -3185,7 +3185,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex justify-center px-6 md:px-10 lg:px-20 xl:px-28 py-6">
       <div className="max-w-7xl w-full mx-auto space-y-6 sm:space-y-8 text-center">
-        <header className="grid grid-cols-1 sm:grid-cols-[auto_1fr] items-center justify-items-center gap-2 w-full px-4 md:px-6">
+        <header className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] items-center justify-items-center gap-2 w-full px-4 md:px-6">
           {/* Left (desktop): Rules · Library · Grimoires */}
           <div className="hidden sm:flex items-center gap-2 md:gap-3 justify-self-start pl-2 sm:pl-4 mt-1 md:mt-3 w-auto">
             <a
@@ -3214,10 +3214,14 @@ export default function App() {
             </button>
           </div>
 
-          {/* Center: Title + Unlock */}
+          {/* Center: Title */}
           <div className="flex flex-col items-center gap-2 justify-self-center">
             <h1 className="text-2xl md:text-4xl font-bold text-center text-slate-900 dark:text-slate-100">WKW Grimoire Binder</h1>
-            {!overrideAll && (
+          </div>
+
+          {/* Right (desktop): Unlock Aspects */}
+          {!overrideAll && (
+            <div className="hidden sm:flex justify-self-end pr-2 sm:pr-4 mt-1 md:mt-3">
               <button
                 type="button"
                 aria-label="Unlock Aspects"
@@ -3226,8 +3230,8 @@ export default function App() {
               >
                 Unlock Aspects
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Mobile buttons (under title): Rules, Library, Grimoires */}
           <div className="sm:hidden col-span-1 w-full flex flex-col items-center gap-2 mt-1">
@@ -3257,6 +3261,16 @@ export default function App() {
                 Grimoires
               </button>
             </div>
+            {!overrideAll && (
+              <button
+                type="button"
+                aria-label="Unlock Aspects"
+                onClick={() => { console.log('[UI] Unlock Codes clicked'); setShowUnlock(true); }}
+                className="rounded-xl border-2 px-4 py-2 text-base bg-indigo-600 text-white hover:bg-indigo-700 shadow-md font-semibold min-w-[160px]"
+              >
+                Unlock Aspects
+              </button>
+            )}
           </div>
         </header>
 
