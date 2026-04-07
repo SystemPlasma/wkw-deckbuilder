@@ -3520,7 +3520,7 @@ export default function App() {
         {/* Cards grouped by Aspect */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
-            <h3 className="font-semibold mb-2 text-center">Spell Pages</h3>
+            <h3 className="font-semibold mb-2 text-center" style={{ fontSize: '26px' }}>Spell Pages</h3>
             {/* Sort by role removed per request; keeping only role filter below */}
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
