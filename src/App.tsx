@@ -3566,8 +3566,10 @@ export default function App() {
                     ? "bg-indigo-100 text-indigo-800 border-indigo-300"
                     : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700",
                 ].join(' ')}
+                aria-label={spellSortDir === 'asc' ? 'Sort descending' : 'Sort ascending'}
+                title={spellSortDir === 'asc' ? 'Sort descending' : 'Sort ascending'}
               >
-                Reverse
+                {spellSortDir === 'asc' ? '↓' : '↑'}
               </button>
             </div>
             <div className="space-y-4">
