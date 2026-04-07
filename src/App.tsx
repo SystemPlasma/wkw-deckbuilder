@@ -1901,6 +1901,7 @@ export default function App() {
     capTimer.current = window.setTimeout(() => setCapAttempt(null), 1500);
   };
   const [spellSort, setSpellSort] = useState<'alpha' | 'ink' | 'copies'>('alpha');
+  const [spellSortDir, setSpellSortDir] = useState<'asc' | 'desc'>('asc');
   const [overrideAll, setOverrideAll] = useState(false);
   // Rank filter: show only cards with rank <= cap
   const [rankCap, setRankCap] = useState<number>(99);
@@ -3556,6 +3557,18 @@ export default function App() {
                   {opt.label}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => setSpellSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+                className={[
+                  "px-3 py-1 rounded-md text-sm border shadow-sm",
+                  spellSortDir === 'desc'
+                    ? "bg-indigo-100 text-indigo-800 border-indigo-300"
+                    : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700",
+                ].join(' ')}
+              >
+                Reverse
+              </button>
             </div>
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
@@ -3566,17 +3579,23 @@ export default function App() {
                   const tb = typeBucket(b);
                   if (ta !== tb) return ta - tb;
                   if (spellSort === 'alpha') {
-                    return a.name.localeCompare(b.name);
+                    const diff = a.name.localeCompare(b.name);
+                    return spellSortDir === 'asc' ? diff : -diff;
                   }
                   if (spellSort === 'ink') {
                     const diff = (a.rank || 0) - (b.rank || 0);
-                    if (diff !== 0) return diff;
-                    return a.name.localeCompare(b.name);
+                    if (diff !== 0) return spellSortDir === 'asc' ? diff : -diff;
+                    const nameDiff = a.name.localeCompare(b.name);
+                    return spellSortDir === 'asc' ? nameDiff : -nameDiff;
                   }
                   const qa = entries[a.id] || 0;
                   const qb = entries[b.id] || 0;
-                  if (qb !== qa) return qb - qa;
-                  return a.name.localeCompare(b.name);
+                  if (qb !== qa) {
+                    const diff = qb - qa;
+                    return spellSortDir === 'asc' ? diff : -diff;
+                  }
+                  const nameDiff = a.name.localeCompare(b.name);
+                  return spellSortDir === 'asc' ? nameDiff : -nameDiff;
                 });
                 return (
                   <div key={group.slug} className="rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 p-3">
