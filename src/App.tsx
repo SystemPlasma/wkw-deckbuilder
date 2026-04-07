@@ -3516,10 +3516,10 @@ export default function App() {
                 type="button"
                 onClick={() => setGroupByType((v) => !v)}
                 className={[
-                  "px-3 py-1 rounded-md text-sm border shadow-sm",
+                  "px-3 py-1 rounded-md text-sm border-2 shadow-sm",
                   groupByType
-                    ? "bg-indigo-100 text-indigo-800 border-indigo-300"
-                    : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700",
+                    ? "bg-indigo-100 text-indigo-800 border-indigo-400"
+                    : "bg-slate-100 text-slate-700 border-slate-400 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-500 dark:hover:bg-slate-700",
                 ].join(' ')}
                 aria-pressed={groupByType}
               >
@@ -3529,10 +3529,10 @@ export default function App() {
                 type="button"
                 onClick={() => setSpellSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
                 className={[
-                  "px-3 py-1 rounded-md text-sm border shadow-sm",
+                  "px-2.5 py-1 rounded-md text-sm border-2 shadow-sm min-w-[2.25rem]",
                   spellSortDir === 'desc'
-                    ? "bg-indigo-100 text-indigo-800 border-indigo-300"
-                    : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700",
+                    ? "bg-indigo-100 text-indigo-800 border-indigo-400"
+                    : "bg-slate-100 text-slate-700 border-slate-400 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-500 dark:hover:bg-slate-700",
                 ].join(' ')}
                 aria-label={spellSortDir === 'asc' ? 'Sort descending' : 'Sort ascending'}
                 title={spellSortDir === 'asc' ? 'Sort descending' : 'Sort ascending'}
