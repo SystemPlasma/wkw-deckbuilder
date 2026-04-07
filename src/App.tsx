@@ -470,7 +470,6 @@ type AdditionalGroupRenderArgs = {
   chosenAspects: string[];
   aspects: Aspect[];
   aspectEligible: (slug: string) => boolean;
-  maxNonSpecialAllowed: number;
   toggleAdditionalGroup: (key: string) => void;
   toggleAspect: (slug: string) => void;
   DARK_SLUGS: readonly string[];
@@ -487,7 +486,6 @@ function renderAdditionalLostAspect(args: AdditionalGroupRenderArgs) {
     chosenAspects,
     aspects,
     aspectEligible,
-    maxNonSpecialAllowed,
     toggleAdditionalGroup,
     toggleAspect,
     DARK_SLUGS,
@@ -500,12 +498,7 @@ function renderAdditionalLostAspect(args: AdditionalGroupRenderArgs) {
   const allowed = aspectAllowedByModes(aspect.slug);
   const modeLocked = !allowed && unlocked && !overrideAll;
   const modeHint = modeRequirementHint(aspect.slug);
-  const nonSpecialSelected = chosenAspects
-    .filter((s) => !aspects.find(x => x.slug === s)?.isSpecial)
-    .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
-  const nextSet = new Set([...nonSpecialSelected, aspect.slug]);
-  const nextCount = nextSet.size;
-  const disabled = modeLocked || (!overrideAll && !isSelected && nextCount > maxNonSpecialAllowed);
+  const disabled = modeLocked;
   const label = aspectDisplayName(aspect, unlocked);
   const labelWithIndicator = isSelected ? `${label} · 1 selected` : label;
 
@@ -549,7 +542,6 @@ type AdditionalGroupListArgs = {
   chosenAspects: string[];
   aspects: Aspect[];
   aspectEligible: (slug: string) => boolean;
-  maxNonSpecialAllowed: number;
   toggleAdditionalGroup: (key: string) => void;
   toggleAspect: (slug: string) => void;
   DARK_SLUGS: readonly string[];
@@ -567,7 +559,6 @@ function renderAdditionalGroup(args: AdditionalGroupListArgs) {
     chosenAspects,
     aspects,
     aspectEligible,
-    maxNonSpecialAllowed,
     toggleAdditionalGroup,
     toggleAspect,
     DARK_SLUGS,
@@ -616,12 +607,7 @@ function renderAdditionalGroup(args: AdditionalGroupListArgs) {
             const allowed = aspectAllowedByModes(a.slug);
             const modeLocked = !allowed && unlockedForCodes && !overrideAll;
             const modeHint = modeRequirementHint(a.slug);
-            const nonSpecialSelected = chosenAspects
-              .filter((s) => !aspects.find(x => x.slug === s)?.isSpecial)
-              .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
-            const nextSet = new Set([...nonSpecialSelected, a.slug]);
-            const nextCount = nextSet.size;
-            const disabled = modeLocked || (!overrideAll && !isSelected && nextCount > maxNonSpecialAllowed);
+            const disabled = modeLocked;
             return (
               <AspectCard
                 key={a.slug}
@@ -2073,7 +2059,6 @@ export default function App() {
     return (DARK_SLUGS as readonly string[]).every((s) => set.has(s));
   })();
   const darkArtsActive = allDarkTrioSelected;
-  const maxNonSpecialAllowed = Number.POSITIVE_INFINITY;
 
   // Enforce Dark Arts restriction by clearing any [Holy] spells when all three Dark aspects are selected
   useEffect(() => {
@@ -2281,9 +2266,7 @@ export default function App() {
       .filter((s) => !aspects.find(a => a.slug === s)?.isSpecial)
       .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
     const nextSet = new Set([...nonSpecialSelected, slug]);
-    const nextCount = nextSet.size;
     const darkTrioSlugs = DARK_SLUGS as readonly string[];
-    if (nextCount > maxNonSpecialAllowed) return;
     setChosenAspects(Array.from(new Set([...chosenAspects, slug])));
 
     // total >= 3 → already at max; do nothing
@@ -3367,14 +3350,11 @@ export default function App() {
                         const nonSpecialSelected = chosenAspects
                           .filter((s) => !aspects.find(x => x.slug === s)?.isSpecial)
                           .filter((s) => aspectEligible(s) && aspectAllowedByModes(s));
-                        const nextSet = new Set([...nonSpecialSelected, a.slug]);
-                        const nextCount = nextSet.size;
                         let disabled = false;
                         if (modeLocked) {
                           disabled = true;
                         } else if (!overrideAll && !isSelected) {
-                          const permitted = nextCount <= maxNonSpecialAllowed;
-                          disabled = !permitted;
+                          disabled = false;
                         }
                         return (
                           <AspectCard
@@ -3526,7 +3506,6 @@ export default function App() {
               chosenAspects,
               aspects,
               aspectEligible,
-              maxNonSpecialAllowed,
               toggleAdditionalGroup,
               toggleAspect,
               DARK_SLUGS,
@@ -3543,7 +3522,6 @@ export default function App() {
               chosenAspects,
               aspects,
               aspectEligible,
-              maxNonSpecialAllowed,
               toggleAdditionalGroup,
               toggleAspect,
               DARK_SLUGS,
