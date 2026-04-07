@@ -11,17 +11,7 @@ const codesCsvUrl: string | undefined = __CODES_BASE || undefined;
 /** ------------------------
  * Card Data
  * ---------------------- */
-type SpellType = "Holy" | "Light" | "Dark" | "Astral" | "Shadow";
-// New role taxonomy (internal keys)
-type Role =
-  | 'power_increase'
-  | 'power_reduction'
-  | 'disruption'
-  | 'search_draw'
-  | 'movement_increase'
-  | 'movement_reduction'
-  | 'special'
-  | 'inflict_status';
+type SpellType = "Holy" | "Light" | "Dark" | "Astral" | "Shadow" | "Travel" | "Info" | "Curse";
 
 type Aspect = {
   slug: string;
@@ -39,7 +29,6 @@ type Card = {
   rank: number;
   maxCopies: number;
   aspect: Aspect["slug"];
-  roles?: Role[]; // Optional, from CSV column `roles` (comma- or semicolon-separated)
 };
 
 const FOCUS_SLUG = 'focus';
@@ -95,6 +84,13 @@ function resolveCardImageUrl(id: string): string | undefined {
   };
 
   return buildAbsolute();
+}
+
+function isReferenceCard(card?: Card | null): boolean {
+  if (!card) return false;
+  const type = card.type;
+  if (type === 'Travel' || type === 'Info') return true;
+  return card.id.toUpperCase().endsWith('_INFO');
 }
 
 // Cache blob URLs for obfuscated images to avoid refetching
@@ -312,27 +308,6 @@ async function loadDataFromCsv() {
     ? parseCSV(cardsRaw).map(r => {
         const rawAspect = (r.aspect || '').trim();
         const normalizedAspect = aspectSlugByKey[rawAspect.toLowerCase()] || (rawAspect as Aspect['slug']);
-        const rolesField = (r.roles || r.role || '').trim();
-        const toRole = (tok: string): Role | undefined => {
-          const t = tok.trim().toLowerCase();
-          // accept new labels
-          if (['power increase','power_increase','powerincrease'].includes(t)) return 'power_increase';
-          if (['power reduction','power_reduction','powerreduction','reduce power','reduction','power decrease','power_decrease'].includes(t)) return 'power_reduction';
-          if (['disruption','disrupt','disruptive','counter','counterspell'].includes(t)) return 'disruption';
-          if (['search/draw','search','draw','search_draw'].includes(t)) return 'search_draw';
-          if (['movement increase','movement_increase','speed'].includes(t)) return 'movement_increase';
-          if (['movement reduction','movement_reduction','slow','root','snare','bind','movement decrease','movement_decrease'].includes(t)) return 'movement_reduction';
-          if (['special'].includes(t)) return 'special';
-          if (['inflict status','inflict_status','status','status effect'].includes(t)) return 'inflict_status';
-          // backward compatibility
-          if (t === 'reveal') return 'search_draw';
-          return undefined;
-        };
-        const roles: Role[] | undefined = rolesField
-          ? Array.from(new Set(
-              rolesField.split(/[,;]+/).map(s => toRole(s)).filter(Boolean) as Role[]
-            ))
-          : undefined;
         return {
           id: r.id,
           name: r.name,
@@ -340,7 +315,6 @@ async function loadDataFromCsv() {
           rank: Number((r as any).InkCost || (r as any).inkCost || r.rank || 0),
           maxCopies: Number(r.maxCopies || 0),
           aspect: normalizedAspect,
-          roles,
         } as Card;
       }).filter(c => c.id && c.name && c.aspect)
     : undefined;
@@ -374,44 +348,16 @@ async function loadDataFromCsv() {
   return { aspects, cards, codes, codeHashes } as { aspects?: Aspect[]; cards?: Card[]; codes?: Record<string,string>; codeHashes?: Record<string,string> };
 }
 
-const TYPE_ORDER: Record<SpellType, number> = { Holy: 5, Light: 4, Astral: 3, Shadow: 2, Dark: 1 };
-const ALL_ROLES: Role[] = [
-  'power_increase','power_reduction','disruption','search_draw','movement_increase','movement_reduction','special','inflict_status'
-];
-
-const ROLE_LABELS: Record<Role, string> = {
-  power_increase: 'POWER Increase',
-  power_reduction: 'POWER Decrease',
-  disruption: 'Disruption',
-  search_draw: 'Search/Draw',
-  movement_increase: 'Movement Increase',
-  movement_reduction: 'Movement Decrease',
-  special: 'Special',
-  inflict_status: 'Inflict Status',
+const TYPE_ORDER: Record<SpellType, number> = {
+  Holy: 7,
+  Light: 6,
+  Astral: 5,
+  Shadow: 4,
+  Dark: 3,
+  Curse: 2,
+  Travel: 1,
+  Info: 0,
 };
-
-const ROLE_BADGE_CLASSES: Record<Role, string> = {
-  power_increase: 'bg-rose-100 text-rose-800',
-  power_reduction: 'bg-rose-200 text-rose-900',
-  disruption: 'bg-blue-100 text-blue-800',
-  search_draw: 'bg-emerald-100 text-emerald-800',
-  movement_increase: 'bg-amber-100 text-amber-800',
-  movement_reduction: 'bg-amber-200 text-amber-900',
-  special: 'bg-fuchsia-100 text-fuchsia-800',
-  inflict_status: 'bg-cyan-100 text-cyan-800',
-};
-
-const ROLE_FILTER_ACTIVE_CLASSES: Record<Role, string> = {
-  power_increase: 'bg-rose-600 border-rose-600 text-white',
-  power_reduction: 'bg-rose-700 border-rose-700 text-white',
-  disruption: 'bg-blue-600 border-blue-600 text-white',
-  search_draw: 'bg-emerald-600 border-emerald-600 text-white',
-  movement_increase: 'bg-amber-600 border-amber-600 text-white',
-  movement_reduction: 'bg-amber-700 border-amber-700 text-white',
-  special: 'bg-fuchsia-600 border-fuchsia-600 text-white',
-  inflict_status: 'bg-cyan-600 border-cyan-600 text-white',
-};
-
 const PARALLEL_CARD_IDS = new Set<string>([
   'energy_supernova_converter','energy_will_power','energy_fears_grasp','energy_rage_unleashed',
   'madness_twisted_space','madness_shattered_time','madness_splintered_mind','madness_unhinged_reality','madness_chaotic_power','madness_eclipsed_soul',
@@ -680,60 +626,9 @@ function renderAdditionalGroup(args: AdditionalGroupListArgs) {
   );
 }
 
-function tokenizeName(name: string): string[] {
-  const stop = new Set(['of','the','and','to','a','an','in','on','by','for','from','with','without','into','out']);
-  return (name || '')
-    .toLowerCase()
-    .split(/[^a-z]+/g)
-    .filter(t => t && t.length >= 3 && !stop.has(t));
-}
-
 /** ------------------------
  * Small UI helpers
  * ---------------------- */
-function Pill({ children }: { children: React.ReactNode }) {
-  return <span className="px-2 py-1 rounded-full text-xs bg-slate-200 dark:bg-slate-700 dark:text-slate-100">{children}</span>;
-}
-
-function SuggestedAspectButton({ explain, slug, onSelect }: { explain: string; slug: string; onSelect: () => void }) {
-  const [active, setActive] = useState(false);
-  const tooltipId = React.useMemo(() => `suggest-${slug.replace(/[^a-z0-9]+/gi, '-')}`, [slug]);
-
-  return (
-    <div className="relative inline-flex items-center">
-      <button
-        type="button"
-        aria-describedby={active ? tooltipId : undefined}
-        className={[
-          'text-xs px-2 py-0.5 rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400',
-          active
-            ? 'bg-indigo-600 text-white border-indigo-600'
-            : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
-        ].join(' ')}
-        onMouseEnter={() => setActive(true)}
-        onMouseLeave={() => setActive(false)}
-        onFocus={() => setActive(true)}
-        onBlur={() => setActive(false)}
-        onClick={() => {
-          setActive(false);
-          onSelect();
-        }}
-      >
-        {active ? 'Select' : 'Explain'}
-      </button>
-      {active && (
-        <div
-          id={tooltipId}
-          role="tooltip"
-          className="absolute left-1/2 top-full z-40 mt-2 w-max max-w-xs -translate-x-1/2 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-100 shadow-lg"
-        >
-          {explain}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ModeToggleRow({
   label,
   description,
@@ -1005,28 +900,28 @@ function CardRow({
   qty,
   onChange,
   locked,
+  readOnly = false,
   onPreview,
   remainingSlots,
   remainingTypeSlots,
   onCapAttempt,
-  showRoles = false,
-  rolesForCard,
 }: {
   card: Card;
   qty: number;
   onChange: (n: number) => void;
   locked: boolean;
+  readOnly?: boolean;
   onPreview?: (card: Card) => void;
   remainingSlots: number;
   remainingTypeSlots: number;
   onCapAttempt?: (t: SpellType) => void;
-  showRoles?: boolean;
-  rolesForCard?: Role[];
 }) {
-  const countsTowardPages = card.type !== 'Astral' && card.type !== 'Shadow';
+  const countsTowardPages = !readOnly && card.type !== 'Astral' && card.type !== 'Shadow';
   const noRoomTotal = countsTowardPages && remainingSlots <= 0;
   const noRoomType = countsTowardPages && remainingTypeSlots <= 0;
-  const addDisabled = !locked && (noRoomTotal || qty >= card.maxCopies);
+  const controlsDisabled = locked || readOnly;
+  const capType = card.type === 'Curse' ? 'Dark' : card.type;
+  const addDisabled = controlsDisabled || (!locked && (noRoomTotal || qty >= card.maxCopies));
   return (
     <div className="flex flex-col md:grid md:grid-cols-[minmax(0,36%)_1fr_auto] md:items-center gap-2 md:gap-3 py-2 px-0">
       {/* Mobile: name left, controls right */}
@@ -1048,8 +943,8 @@ function CardRow({
         </div>
         <div className="grid grid-cols-3 grid-rows-2 items-center gap-x-2 gap-y-1">
           <button
-            onClick={() => { if (qty <= 0) return; const n = Math.max(0, qty - 1); onChange(n); }}
-            disabled={qty <= 0}
+            onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); onChange(n); }}
+            disabled={controlsDisabled || qty <= 0}
             className={["px-1.5 py-1 rounded shadow-sm text-base font-bold text-slate-900 dark:text-slate-900 leading-none", qty <= 0 ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
           >
             -
@@ -1057,29 +952,29 @@ function CardRow({
           <div className="w-7 text-center">{qty}</div>
           <button
             onClick={() => {
-              if (locked) return;
-              if (noRoomType) { onCapAttempt?.(card.type); return; }
-              if (addDisabled) return;
-              const n = Math.min(card.maxCopies, qty + 1);
-              onChange(n);
-            }}
-            disabled={locked || noRoomTotal || qty >= card.maxCopies}
+            if (controlsDisabled) return;
+            if (noRoomType) { onCapAttempt?.(capType); return; }
+            if (addDisabled) return;
+            const n = Math.min(card.maxCopies, qty + 1);
+            onChange(n);
+          }}
+            disabled={controlsDisabled || noRoomTotal || qty >= card.maxCopies}
             className={["px-1.5 py-1 rounded shadow-sm text-base font-bold text-slate-900 dark:text-slate-900 leading-none", locked || addDisabled || qty >= card.maxCopies ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
           >
             +
           </button>
           <button
             onClick={() => {
-              if (locked) return;
+              if (controlsDisabled) return;
               if (!countsTowardPages) { onChange(card.maxCopies); return; }
               const roomTotal = Math.max(0, remainingSlots);
               const roomType = Math.max(0, remainingTypeSlots);
               const room = Math.min(roomTotal, roomType);
-              if (room <= 0) { if (roomType <= 0) onCapAttempt?.(card.type); return; }
+              if (room <= 0) { if (roomType <= 0) onCapAttempt?.(capType); return; }
               const target = Math.min(card.maxCopies, qty + room);
               onChange(target);
             }}
-            disabled={locked || noRoomTotal}
+            disabled={controlsDisabled || noRoomTotal}
             className={[
               "col-start-3 row-start-2 justify-self-end px-1.5 py-1 text-xs rounded shadow-sm",
               (locked || noRoomTotal)
@@ -1108,18 +1003,6 @@ function CardRow({
             {card.name}
           </button>
         )}
-        {showRoles && (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {(() => {
-              const roles = (rolesForCard && rolesForCard.length>0)
-                ? rolesForCard
-                : (card.roles && card.roles.length>0 ? card.roles : []);
-              return roles.map((r: Role) => (
-                <span key={r} className={`text-[10px] px-1.5 py-0.5 rounded ${ROLE_BADGE_CLASSES[r]}`}>{ROLE_LABELS[r]}</span>
-              ));
-            })()}
-          </div>
-        )}
       </div>
       {/* Center: type/rank/max — stacked on mobile, grouped with spacing on md+ */}
       <div className="w-full md:col-start-2 leading-tight text-center md:text-left md:pl-0 md:pr-0 min-w-0">
@@ -1132,7 +1015,9 @@ function CardRow({
               return locked ? '?' : `${card.type}${mark} · ${costLabel}: ${card.rank}`;
             })()}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-300 mt-1">Max {card.maxCopies}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-300 mt-1">
+            {readOnly ? 'View only' : `Max ${card.maxCopies}`}
+          </div>
         </div>
         {/* Desktop: single line with spacing between left (type/rank) and right (Max) */}
         <div className="hidden md:flex items-baseline justify-start gap-4">
@@ -1143,15 +1028,17 @@ function CardRow({
               return locked ? '?' : `${card.type}${mark} · ${costLabel}: ${card.rank}`;
             })()}
           </span>
-          <span className="text-sm text-slate-500 dark:text-slate-300 whitespace-nowrap">Max {card.maxCopies}</span>
+          <span className="text-sm text-slate-500 dark:text-slate-300 whitespace-nowrap">
+            {readOnly ? 'View only' : `Max ${card.maxCopies}`}
+          </span>
         </div>
       </div>
 
       {/* Right controls pinned to the far right (desktop) */}
       <div className="hidden md:flex items-center gap-2 shrink-0 md:col-start-3 md:justify-self-end">
         <button
-          onClick={() => { if (qty <= 0) return; const n = Math.max(0, qty - 1); console.log('[CardRow.qty-]', { id: card.id, from: qty, to: n }); onChange(n); }}
-          disabled={qty <= 0}
+          onClick={() => { if (controlsDisabled || qty <= 0) return; const n = Math.max(0, qty - 1); console.log('[CardRow.qty-]', { id: card.id, from: qty, to: n }); onChange(n); }}
+          disabled={controlsDisabled || qty <= 0}
           className={["px-1.5 py-1 md:px-2 rounded shadow-sm text-base md:text-lg font-bold text-slate-900 dark:text-slate-900 leading-none", qty <= 0 ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
         >
           -
@@ -1159,21 +1046,21 @@ function CardRow({
         <div className="w-7 md:w-8 text-center">{qty}</div>
         <button
           onClick={() => {
-            if (locked) return;
-            if (noRoomType) { onCapAttempt?.(card.type); return; }
+            if (controlsDisabled) return;
+            if (noRoomType) { onCapAttempt?.(capType); return; }
             if (addDisabled) return;
             const n = Math.min(card.maxCopies, qty + 1);
             console.log('[CardRow.qty+]', { id: card.id, from: qty, to: n });
             onChange(n);
           }}
-          disabled={locked || noRoomTotal || qty >= card.maxCopies}
+          disabled={controlsDisabled || noRoomTotal || qty >= card.maxCopies}
           className={["px-1.5 py-1 md:px-2 rounded shadow-sm text-base md:text-lg font-bold text-slate-900 dark:text-slate-900 leading-none", locked || addDisabled || qty >= card.maxCopies ? "bg-slate-100 opacity-50 cursor-not-allowed" : "bg-slate-100"].join(' ')}
         >
           +
         </button>
         <button
           onClick={() => {
-            if (locked) return;
+            if (controlsDisabled) return;
             if (!countsTowardPages) {
               console.log('[CardRow.max]', { id: card.id, to: card.maxCopies });
               onChange(card.maxCopies);
@@ -1182,12 +1069,12 @@ function CardRow({
             const roomTotal = Math.max(0, remainingSlots);
             const roomType = Math.max(0, remainingTypeSlots);
             const room = Math.min(roomTotal, roomType);
-            if (room <= 0) { if (roomType <= 0) onCapAttempt?.(card.type); return; }
+            if (room <= 0) { if (roomType <= 0) onCapAttempt?.(capType); return; }
             const target = Math.min(card.maxCopies, qty + room);
             console.log('[CardRow.max]', { id: card.id, from: qty, room, to: target });
             onChange(target);
           }}
-          disabled={locked || noRoomTotal}
+          disabled={controlsDisabled || noRoomTotal}
           className={["px-1.5 py-1 md:px-2 text-xs md:text-sm rounded shadow-sm", (locked || noRoomTotal) ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"].join(' ')}
           title={`Set to Max (${card.maxCopies})`}
         >
@@ -1291,8 +1178,8 @@ function DeckExport({ entries, aspects, cards, hasAstral, hasShadow }: { entries
         return { qty: e.qty, card: c, aspectName: nameByAspect[c.aspect] || c.aspect };
       });
 
-    // Build groups by type in order Holy > Light > Dark > Astral > Shadow
-    const typeOrder: SpellType[] = ["Holy", "Light", "Dark", "Astral", "Shadow"];
+    // Build groups by type in order Holy > Light > Dark > Curse > Astral > Shadow
+    const typeOrder: SpellType[] = ["Holy", "Light", "Dark", "Curse", "Astral", "Shadow"];
     const result: { type: SpellType; lines: string[] }[] = [];
 
     for (const t of typeOrder) {
@@ -1323,7 +1210,7 @@ function DeckExport({ entries, aspects, cards, hasAstral, hasShadow }: { entries
       {(() => {
         // Helper to fetch lines for a given type
         const byType: Record<SpellType, string[]> = {
-          Holy: [], Light: [], Dark: [], Astral: [], Shadow: []
+          Holy: [], Light: [], Dark: [], Curse: [], Astral: [], Shadow: [], Travel: [], Info: [],
         };
         for (const g of groups) byType[g.type] = g.lines;
 
@@ -1410,11 +1297,7 @@ export default function App() {
   const [preboundForm, setPreboundForm] = useState<PreboundGrimoire>({ id: '', name: '', description: '', aspects: [], spellCards: [], recommended: false, loreTagline: '' });
   const [preboundEditId, setPreboundEditId] = useState<string | null>(null);
   const [preboundsBaseIds, setPreboundsBaseIds] = useState<string[]>([]);
-  const [showTips, setShowTips] = useState(false);
-  const [showSubtypes, setShowSubtypes] = useState(false);
-  const [roleFilter, setRoleFilter] = useState<Role[]>([]);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
-  const [useInference, setUseInference] = useState(false);
   const [sectionExpanded, setSectionExpanded] = useState<Record<CollapsibleSectionId, boolean>>({
     basics: true,
     dark: true,
@@ -1504,41 +1387,6 @@ export default function App() {
     })();
     return () => { mounted = false; };
   }, []);
-
-  // Build heuristics dynamically from cards that already have CSV roles.
-  const roleHeuristics = useMemo(() => {
-    const tokensByRole: Record<Role, Record<string, number>> = Object.fromEntries(ALL_ROLES.map(r => [r, {}])) as any;
-    let anySeed = false;
-    for (const c of cards) {
-      if (c.roles && c.roles.length > 0) {
-        anySeed = true;
-        const toks = tokenizeName(c.name);
-        for (const r of c.roles) {
-          for (const t of toks) tokensByRole[r][t] = (tokensByRole[r][t] || 0) + 1;
-        }
-      }
-    }
-    // Select top tokens per role for light heuristic matching
-    const map: Record<Role, string[]> = Object.fromEntries(ALL_ROLES.map(r => [r, []])) as any;
-    for (const r of ALL_ROLES) {
-      const entries = Object.entries(tokensByRole[r]);
-      entries.sort((a,b)=>b[1]-a[1]);
-      map[r] = entries.slice(0, 20).map(([t]) => t);
-    }
-    return { map, anySeed };
-  }, [cards]);
-
-  const getRoles = useCallback((c: Card): Role[] => {
-    if (c.roles && c.roles.length > 0) return c.roles;
-    // Infer using heuristics derived from CSV roles
-    const toks = tokenizeName(c.name);
-    const out: Role[] = [];
-    for (const r of ALL_ROLES) {
-      const list = roleHeuristics.map[r];
-      if (list && list.some(t => toks.includes(t))) out.push(r);
-    }
-    return out;
-  }, [roleHeuristics]);
 
   // Deck persistence and sharing
   type SavedDeck = {
@@ -1960,11 +1808,11 @@ export default function App() {
       .filter(([_, q]) => (q || 0) > 0)
       .map(([id, qty]) => {
         const c = cards.find(x => x.id === id);
-        if (!c) return null as any;
+        if (!c || isReferenceCard(c)) return null as any;
         return { qty: qty || 0, card: c, aspectName: nameByAspect[c.aspect] || c.aspect };
       })
       .filter(Boolean) as { qty: number; card: Card; aspectName: string }[];
-    const types: SpellType[] = ['Holy','Light','Dark','Astral','Shadow'];
+    const types: SpellType[] = ['Holy','Light','Dark','Curse','Astral','Shadow'];
     const enabled = (t: SpellType) => (t==='Astral'? hasAstral : t==='Shadow'? hasShadow : true);
     const win = window.open('', '_blank'); if (!win) return;
     const css = `
@@ -2445,12 +2293,6 @@ export default function App() {
       .filter((c) => selectedAspectSlugs.includes(c.aspect))
       .filter((c) => parallelModeActive || !PARALLEL_CARD_IDS.has(c.id))
       .filter((c) => c.rank <= rankCap)
-      .filter((c) => {
-        // Role filter (if any selected)
-        if (!roleFilter || roleFilter.length === 0) return true;
-        const roles = getRoles(c);
-        return roleFilter.some(r => roles.includes(r));
-      })
       .map((c) => ({ ...c, maxCopies: effectiveMaxCopies[c.id] ?? c.maxCopies }))
       .sort((a, b) => {
         // Aspect order fixed at top of list
@@ -2469,7 +2311,7 @@ export default function App() {
       // Name desc
       return b.name.localeCompare(a.name);
     });
-  }, [ASPECT_INDEX, cards, effectiveMaxCopies, getRoles, parallelModeActive, rankCap, roleFilter, selectedAspectSlugs]);
+  }, [ASPECT_INDEX, cards, effectiveMaxCopies, parallelModeActive, rankCap, selectedAspectSlugs]);
 
   const groupedByAspect = useMemo(() => {
     const map: Record<string, Card[]> = {};
@@ -2504,7 +2346,7 @@ export default function App() {
     for (const [id, qty] of Object.entries(entries)) {
       const card = cards.find(c => c.id === id);
       if (!card || qty <= 0) continue;
-      if (card.type === "Astral" || card.type === "Shadow") continue;
+      if (card.type === "Astral" || card.type === "Shadow" || isReferenceCard(card)) continue;
       pages += qty;
     }
     return pages;
@@ -2515,10 +2357,11 @@ export default function App() {
     for (const [id, qty] of Object.entries(entries)) {
       const card = cards.find(c => c.id === id);
       if (!card || qty <= 0) continue;
+      if (isReferenceCard(card)) continue;
       const t = card.type as SpellType;
       if (t === "Holy") holy += qty;
       else if (t === "Light") light += qty;
-      else if (t === "Dark") dark += qty;
+      else if (t === "Dark" || t === "Curse") dark += qty;
       else if (t === "Astral") astral += qty;
       else if (t === "Shadow") shadow += qty;
     }
@@ -2533,6 +2376,22 @@ export default function App() {
     return map;
   }, [cards]);
 
+  useEffect(() => {
+    setEntries((prev) => {
+      let changed = false;
+      const next: Record<string, number> = { ...prev };
+      for (const [id, qty] of Object.entries(prev)) {
+        if (qty <= 0) continue;
+        const card = cardsById[id];
+        if (card && isReferenceCard(card)) {
+          next[id] = 0;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [cardsById]);
+
   // Auto-include all Study spells at Rank 2+ if none are present yet in the Path
   useEffect(() => {
     if (rankCap < 2) return;
@@ -2540,7 +2399,7 @@ export default function App() {
       ([id, qty]) => (qty || 0) > 0 && cardsById[id]?.aspect === STUDY_SLUG
     );
     if (studyPresent) return;
-    const studyCards = cards.filter((c) => c.aspect === STUDY_SLUG && c.rank <= rankCap);
+    const studyCards = cards.filter((c) => c.aspect === STUDY_SLUG && c.rank <= rankCap && !isReferenceCard(c));
     if (studyCards.length === 0) return;
     setEntries((prev) => {
       const next: Record<string, number> = { ...prev };
@@ -2559,6 +2418,10 @@ export default function App() {
 
   function setQty(cardId: string, n: number) {
     const card = cardsById[cardId];
+    if (card && isReferenceCard(card)) {
+      setEntries((prev) => ({ ...prev, [cardId]: 0 }));
+      return;
+    }
     if (darkArtsActive && card?.type === 'Holy') {
       alert('Dark Arts is active. Holy spells cannot be added to the Path.');
       setEntries((prev) => ({ ...prev, [cardId]: 0 }));
@@ -2577,7 +2440,7 @@ export default function App() {
       if (qty <= 0) continue;
       const card = cardsById[id];
       if (!card) continue;
-      if (card.type === 'Travel') continue; // Travel uses MP, not INK
+      if (isReferenceCard(card)) continue; // Travel/Info do not use INK
       const cost = Number(card.rank || 0);
       if (!Number.isFinite(cost)) continue;
       total += cost * qty;
@@ -2586,8 +2449,7 @@ export default function App() {
   }, [cardsById, entries]);
 
   const TYPE_LIMITS = useMemo(() => {
-    // Path no longer enforces per-type caps; Astral/Shadow slots still follow their toggle caps elsewhere
-    return { Holy: Number.POSITIVE_INFINITY, Light: Number.POSITIVE_INFINITY, Dark: Number.POSITIVE_INFINITY } as Partial<Record<SpellType, number>>;
+    return { Holy: 5, Light: 52, Dark: 3 } as Partial<Record<SpellType, number>>;
   }, []);
 
   const remainingByType = useMemo(() => ({
@@ -2596,6 +2458,9 @@ export default function App() {
     Dark: Math.max(0, (TYPE_LIMITS.Dark ?? Infinity) - counts.Dark),
     Astral: Number.POSITIVE_INFINITY,
     Shadow: Number.POSITIVE_INFINITY,
+    Travel: Number.POSITIVE_INFINITY,
+    Info: Number.POSITIVE_INFINITY,
+    Curse: Math.max(0, (TYPE_LIMITS.Dark ?? Infinity) - counts.Dark),
   } as Record<SpellType, number>), [counts, TYPE_LIMITS]);
 
   const computeDeckUsageStats = useCallback((entriesMap: Record<string, number>) => {
@@ -2609,6 +2474,7 @@ export default function App() {
       if (qty <= 0) continue;
       const card = cardsById[id];
       const type = card?.type as SpellType | undefined;
+      if (card && isReferenceCard(card)) continue;
       total += qty;
       if (!card || (type !== 'Astral' && type !== 'Shadow')) {
         pages += qty;
@@ -2781,6 +2647,7 @@ export default function App() {
         const q = qty || 0; if (q <= 0) continue;
         totalCards += q;
         const c = cardsById[cid];
+        if (c && isReferenceCard(c)) continue;
         if (c?.type === 'Astral') seesAstral = true;
         if (c?.type === 'Shadow') seesShadow = true;
         if (!c || (c.type !== 'Astral' && c.type !== 'Shadow')) totalPages += q;
@@ -2793,12 +2660,12 @@ export default function App() {
         shadow_addition: (prev.shadow_addition || seesShadow || templateHasShadow),
       }));
 
-      // Compute caps using intended modes — Path has no page/type caps
-      const pageCap = Number.POSITIVE_INFINITY;
+      // Compute caps using intended modes
+      const pageCap = pageLimit;
       const typeCaps: Record<'Holy'|'Light'|'Dark', number> = {
-        Holy: Number.POSITIVE_INFINITY,
-        Light: Number.POSITIVE_INFINITY,
-        Dark: Number.POSITIVE_INFINITY,
+        Holy: TYPE_LIMITS.Holy ?? Number.POSITIVE_INFINITY,
+        Light: TYPE_LIMITS.Light ?? Number.POSITIVE_INFINITY,
+        Dark: TYPE_LIMITS.Dark ?? Number.POSITIVE_INFINITY,
       };
       const astralCap = seesAstral ? 7 : 0;
       const shadowCap = seesShadow ? 3 : 0;
@@ -2816,6 +2683,7 @@ export default function App() {
       for (const [cid, want] of Object.entries(desired)) {
         const c = cardsById[cid]; if (!c) continue;
         const q = want || 0; if (q<=0) continue;
+        if (isReferenceCard(c)) continue;
         if (c.type === 'Astral') {
           const max = targetMaxById[cid] ?? c.maxCopies;
           const n = Math.min(q, astralLeft, max);
@@ -2830,6 +2698,7 @@ export default function App() {
       // Then allocate Holy/Light/Dark pages under per-type and total page caps
       const addPage = (cid: string, maxAdd: number) => {
         const c = cardsById[cid]!;
+        if (isReferenceCard(c)) return 0;
         const leftByType = c.type === 'Holy' ? holyLeft : c.type === 'Light' ? lightLeft : darkLeft;
         const max = targetMaxById[cid] ?? c.maxCopies;
         const n = Math.max(0, Math.min(maxAdd, leftByType, pagesLeft, max));
@@ -2846,6 +2715,7 @@ export default function App() {
         else if (raw && typeof raw==='object') { id=(raw as any).id; const n=parseInt(String((raw as any).count ?? '1'),10); if(Number.isFinite(n)&&n>0) want=n; }
         const cid = resolveId(id);
         if (!cid) continue; const c = cardsById[cid]; if (!c) continue;
+        if (isReferenceCard(c)) continue;
         if (c.type==='Astral' || c.type==='Shadow') continue; // already allocated above
         const already = finalEntries[cid]||0;
         const remaining = Math.max(0, (desired[cid]||0) - already);
@@ -2872,7 +2742,7 @@ export default function App() {
       }
     } catch {}
     setShowLibrary(false);
-  }, [cards, canUseGrimoire, isBasicAspect, rankCap]);
+  }, [TYPE_LIMITS, cards, canUseGrimoire, isBasicAspect, pageLimit, rankCap]);
 
   // Admin helpers for Pre-Bound Grimoires
   const slugify = useCallback((s: string) => (s||'')
@@ -3676,30 +3546,6 @@ export default function App() {
           <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold mb-2 text-center">Cards (from selected Aspects)</h3>
             {/* Sort by role removed per request; keeping only role filter below */}
-            {/* Role filter (visible only when Tips + Subtypes are on) */}
-            {showTips && showSubtypes && (
-            <div className="mb-3 flex items-center justify-center gap-2 flex-wrap">
-              {ALL_ROLES.map(r => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setRoleFilter(prev => prev.includes(r) ? prev.filter(x=>x!==r) : [...prev, r])}
-                  className={[
-                    'px-3 py-1 rounded-full text-sm border',
-                    roleFilter.includes(r)
-                      ? ROLE_FILTER_ACTIVE_CLASSES[r]
-                      : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600'
-                  ].join(' ')}
-                  title={roleFilter.includes(r)? 'Remove filter': 'Filter by role'}
-                >
-                  {ROLE_LABELS[r]}
-                </button>
-              ))}
-              {roleFilter.length>0 && (
-                <button type="button" onClick={()=>setRoleFilter([])} className="px-3 py-1 rounded-full text-sm border bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600">Clear</button>
-              )}
-            </div>
-            )}
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
                 const collapsed = collapsedGroups[group.slug] ?? false;
@@ -3725,12 +3571,13 @@ export default function App() {
                         <div className="mb-2 max-w-xl mx-auto px-6 md:px-8 lg:px-10 flex items-center justify-center gap-3">
                           {(() => {
                             const pageCapReached = totalQty >= pageLimit;
-                            const groupHasCountable = group.cards.some(c => c.type !== 'Astral' && c.type !== 'Shadow');
+                            const groupHasSelectable = group.cards.some(c => !isReferenceCard(c));
+                            const groupHasCountable = group.cards.some(c => !isReferenceCard(c) && c.type !== 'Astral' && c.type !== 'Shadow');
                             const allAstral = group.cards.every(c => c.type === 'Astral');
                             const allShadow = group.cards.every(c => c.type === 'Shadow');
                             const astralCap = starlightModeActive ? 7 : 0;
                             const shadowCap = shadowModeActive ? 3 : 0;
-                            let pickDisabled = pageCapReached && groupHasCountable;
+                            let pickDisabled = !groupHasSelectable || (pageCapReached && groupHasCountable);
                             if (allAstral) {
                               const allAtMax = group.cards.every(c => (entries[c.id] || 0) >= c.maxCopies);
                               const typeCapReached = astralCap <= 0 || counts.Astral >= astralCap;
@@ -3761,6 +3608,7 @@ export default function App() {
                                       let shadowRoom = Math.max(0, shadowCap - counts.Shadow);
                                       let holyBlockedAlerted = false;
                                       for (const card of group.cards) {
+                                        if (isReferenceCard(card)) continue;
                                         const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
                                         if (locked) continue;
                                         if (darkArtsActive && card.type === 'Holy') {
@@ -3835,13 +3683,12 @@ export default function App() {
                                 card={card}
                                 qty={qty}
                                 locked={locked}
+                                readOnly={isReferenceCard(card)}
                                 onChange={(n) => setQty(card.id, n)}
                                 onPreview={async (c) => { console.log('[App.setPreviewCard]', c.id); prefetchCardImage(c.id, 0); setPreviewCard(c); }}
                                 remainingSlots={Math.max(0, pageLimit - totalQty)}
                                 remainingTypeSlots={remainingByType[card.type] ?? Number.POSITIVE_INFINITY}
                                 onCapAttempt={showCapAttempt}
-                                showRoles={showTips && showSubtypes}
-                                rolesForCard={getRoles(card)}
                               />
                             );
                           })}
@@ -3871,7 +3718,7 @@ export default function App() {
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 p-3">
                 {focusCards.length > 0 ? (
                   <div className="space-y-3">
-                    {(['Holy','Light','Dark','Astral','Shadow'] as SpellType[]).map((t) => {
+                    {(['Holy','Light','Dark','Curse','Travel','Info','Astral','Shadow'] as SpellType[]).map((t) => {
                       const group = focusCards
                         .filter((c) => c.type === t)
                         .slice()
@@ -3932,6 +3779,7 @@ export default function App() {
                   <div className="mt-1 text-sm">{extraSummaryLine}</div>
                 )}
                 <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Copy limits apply. Page cap: {pageLimit}.</div>
+                <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Type caps: Holy {TYPE_LIMITS.Holy} · Light {TYPE_LIMITS.Light} · Dark {TYPE_LIMITS.Dark}</div>
                 {darkArtsActive && (
                   <div className="mt-1 text-sm text-red-600 font-semibold">
                     Dark Arts active: All 3 Dark Arts are allowed, but [Holy] spells are blocked.
@@ -3939,135 +3787,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Tips / Suggestions Toggle */}
-              <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-                <label className="text-sm text-slate-700 dark:text-slate-200">Tips & Suggestions</label>
-                <button
-                  type="button"
-                  onClick={() => setShowTips(v => { const nv=!v; if(!nv) setShowSubtypes(false); return nv; })}
-                  className={[
-                    'px-3 py-1 rounded-full text-sm border',
-                    showTips ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600'
-                  ].join(' ')}
-                >
-                  {showTips ? 'On' : 'Off'}
-                </button>
-                {showTips && (
-                  <>
-                    <span className="mx-1 text-slate-400">|</span>
-                    <label className="text-sm text-slate-700 dark:text-slate-200">Show Subtypes</label>
-                    <button
-                      type="button"
-                      onClick={() => setShowSubtypes(v => !v)}
-                      className={[
-                        'px-3 py-1 rounded-full text-sm border',
-                        showSubtypes ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600'
-                      ].join(' ')}
-                    >
-                      {showSubtypes ? 'On' : 'Off'}
-                    </button>
-                    {isDev && (
-                      <>
-                        <span className="mx-1 text-slate-400">|</span>
-                        <label className="text-sm text-slate-700 dark:text-slate-200">Infer Missing Roles</label>
-                        <button
-                          type="button"
-                          onClick={() => setUseInference(v => !v)}
-                          className={[
-                            'px-3 py-1 rounded-full text-sm border',
-                            useInference ? 'bg-teal-600 text-white border-teal-600' : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600'
-                          ].join(' ')}
-                          title="When Off, only roles from CSV are used"
-                        >
-                          {useInference ? 'On' : 'Off'}
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {showTips && (() => {
-                const countsByRole = Object.fromEntries(ALL_ROLES.map(r => [r, 0])) as Record<Role, number>;
-                for (const [id, q] of Object.entries(entries)) {
-                  const qty = q || 0; if (qty <= 0) continue; const c = cards.find(x=>x.id===id); if (!c) continue; const n=(c.name||'').toLowerCase();
-                  const roles = getRoles(c);
-                  for (const r of roles) countsByRole[r] += qty;
-                }
-
-                // Suggestions when exactly one non-special aspect is chosen
-                const aspectBySlug: Record<string, Aspect> = Object.fromEntries(aspects.map(a=>[a.slug,a] as const));
-                const chosenNonSpecial = chosenAspects.filter(s => !aspectBySlug[s]?.isSpecial);
-                const nameByAspect: Record<string, string> = Object.fromEntries(aspects.map(a=>[a.slug,a.name] as const));
-                const missingKeys = ALL_ROLES.filter(k => countsByRole[k] === 0);
-                const explainForAspect = (slug: string) => {
-                  const cover: Partial<Record<Role, number>> = {};
-                  for (const c of cards) {
-                    if (c.aspect !== slug) continue;
-                    const roles = getRoles(c);
-                    for (const r of roles) cover[r] = (cover[r]||0)+1;
-                  }
-                  const parts = ALL_ROLES
-                    .filter(r => (cover as any)[r] && (missingKeys.length===0 || missingKeys.includes(r)))
-                    .map(r => `${ROLE_LABELS[r]}: ${(cover as any)[r]}`);
-                  return parts.length ? `Covers → ${parts.join(' · ')}` : 'Limited coverage for current needs';
-                };
-                let suggestions: { slug: string; name: string; explain: string }[] = [];
-                if (chosenNonSpecial.length === 1) {
-                  const candidateSlugs = aspects
-                    .filter(a => !isBasicAspect(a.slug) && !a.isSpecial && aspectEligible(a.slug) && unlocksSet.has(a.slug) && !chosenAspects.includes(a.slug))
-                    .map(a=>a.slug);
-                  const score = (slug: string) => {
-                    let k = 0; for (const c of cards) { if (c.aspect !== slug) continue; const roles = getRoles(c); for (const r of roles) if (missingKeys.includes(r)) k++; }
-                    return k;
-                  };
-                  suggestions = candidateSlugs
-                    .map(s => ({ s, k: score(s) }))
-                    .filter(x => x.k > 0 || missingKeys.length===0)
-                    .sort((a,b)=>b.k-a.k || (nameByAspect[a.s]||a.s).localeCompare(nameByAspect[b.s]||b.s))
-                    .slice(0,3)
-                    .map(x => ({ slug: x.s, name: nameByAspect[x.s] || x.s, explain: explainForAspect(x.s) }));
-                }
-
-                return (
-                  <div className="mt-3 text-left">
-                    <div className="rounded-lg border border-slate-300 dark:border-slate-700 p-3 bg-white/60 dark:bg-slate-900/40">
-                      <div className="font-semibold mb-2">Role Coverage</div>
-                      <ul className="grid grid-cols-2 gap-2 text-sm">
-                        {ALL_ROLES.map((role) => (
-                          <li
-                            key={role}
-                            className={countsByRole[role]>0? 'text-emerald-700 dark:text-emerald-300':'text-slate-500'}
-                          >
-                            • {ROLE_LABELS[role]} — {countsByRole[role]}
-                          </li>
-                        ))}
-                      </ul>
-                      {chosenNonSpecial.length === 1 && (
-                        <div className="mt-3">
-                          <div className="font-semibold mb-1">Suggested Aspects</div>
-                          {suggestions.length > 0 ? (
-                            <div className="flex flex-col gap-1 text-sm">
-                              {suggestions.map((s, i) => (
-                                <div key={`${s.slug}-${i}`} className="flex items-center justify-between gap-3">
-                                  <span className="select-text">{s.name}</span>
-                                  <SuggestedAspectButton
-                                    explain={s.explain}
-                                    slug={s.slug}
-                                    onSelect={() => toggleAspect(s.slug)}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                        <div className="text-sm text-slate-500">No suggestions — current grimoire covers most roles.</div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
@@ -4081,8 +3800,8 @@ export default function App() {
                 const expanded = Object.entries(entries)
                   .filter(([_, q]) => (q || 0) > 0)
                   .map(([id, qty]) => ({ qty: qty || 0, card: cards.find(c => c.id === id)! }))
-                  .filter(x => x.card);
-                const types: SpellType[] = ['Holy','Light','Dark','Astral','Shadow'];
+                  .filter(x => x.card && !isReferenceCard(x.card));
+                const types: SpellType[] = ['Holy','Light','Dark','Curse','Astral','Shadow'];
                 const shouldShow = (t: SpellType) => {
                   if (t === 'Astral' && !hasAstral) return false;
                   if (t === 'Shadow' && !hasShadow) return false;
