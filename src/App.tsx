@@ -3810,9 +3810,7 @@ export default function App() {
               <h3 className="font-semibold mb-2 text-center">Grimoire Summary:</h3>
               <div className="text-center font-mono whitespace-pre-wrap">
                 <div className="text-lg">{totalCopies} Spells in Grimoire</div>
-                <div className="flex items-center justify-center gap-6 text-sm font-medium mt-1">
-                  <span>Pages: {totalQty}</span>
-                </div>
+                
                 <div className="flex items-center justify-center gap-6 mt-2">
                   <span className={capAttempt === 'Holy' ? 'text-red-600 font-bold' : undefined}>
                     [Holy]: {counts.Holy}{darkArtsActive ? ' (blocked)' : ''}{'\u00A0\u00A0\u00A0'}
