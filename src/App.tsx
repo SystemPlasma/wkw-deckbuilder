@@ -1206,7 +1206,8 @@ function DeckExport({ entries, aspects, cards, hasAstral, hasShadow }: { entries
         lines: items.map(({ qty, card, aspectName }) => {
           const name = (aspectName || '').replace(/^Aspect of\s+/i, '');
           const tag = PARALLEL_CARD_IDS.has(card.id) ? ' (Parallel)' : '';
-          return `(R${card.rank}) {${name}} ${card.name}${tag} —\u00A0x${qty}`;
+          const costLabel = (card.type as any) === 'Travel' ? 'MP' : 'INK';
+          return `(${costLabel}: ${card.rank}) {${name}} ${card.name}${tag} —\u00A0x${qty}`;
         }),
       });
     }
@@ -3812,7 +3813,9 @@ export default function App() {
                                   <span className="font-semibold text-indigo-700 dark:text-indigo-200 underline decoration-2 decoration-indigo-400 dark:decoration-indigo-300 underline-offset-2">
                                     {card.name}
                                   </span>
-                                  <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap">R{card.rank} · x{qty}</span>
+                                  <span className="text-xs text-slate-500 dark:text-slate-300 whitespace-nowrap">
+                                    {((card.type as any) === 'Travel' ? 'MP' : 'INK')}: {card.rank} · x{qty}
+                                  </span>
                                 </button>
                               ))}
                             </div>
