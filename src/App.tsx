@@ -89,7 +89,7 @@ function resolveCardImageUrl(id: string): string | undefined {
 function isReferenceCard(card?: Card | null): boolean {
   if (!card) return false;
   const type = card.type;
-  if (type === 'Travel' || type === 'Info') return true;
+  if (type === 'Travel' || type === 'Info' || type === 'Curse') return true;
   return card.id.toUpperCase().endsWith('_INFO');
 }
 
