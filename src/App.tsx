@@ -731,9 +731,7 @@ function AspectCard({
         ) : (
           <div className="text-base font-semibold">Locked</div>
         )}
-        <div className="flex items-center gap-2 mt-1">          
-          {selected && <Pill>(Selected)</Pill>}
-        </div>
+        <div className="flex items-center gap-2 mt-1" />
         {hint && (!unlocked || disabled) && (
           <div className="mt-2 text-xs text-amber-600 dark:text-amber-300 text-center leading-snug">
             {hint}
@@ -3253,10 +3251,10 @@ export default function App() {
                     .sort((a, b) => (ASPECT_INDEX[a.slug] ?? 999) - (ASPECT_INDEX[b.slug] ?? 999))
                     .map((a) => (
                       <div key={a.slug}>
-                        {a.slug === STUDY_SLUG ? (
-                            <div className="rounded-2xl p-4 w-full text-center border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 dark:border-emerald-500 shadow-sm">
-                              <div className="text-sm text-emerald-700 dark:text-emerald-200">Core</div>
-                              <div className="text-base font-semibold">{a.name}</div>
+                        {a.slug === STUDY_SLUG || a.slug === FOCUS_SLUG ? (
+                          <div className="rounded-2xl p-4 w-full text-center border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/40 dark:border-emerald-500 shadow-sm">
+                            <div className="text-sm text-emerald-700 dark:text-emerald-200">Core</div>
+                            <div className="text-base font-semibold">{a.name}</div>
                             <div className="mt-1 text-xs text-emerald-700 dark:text-emerald-200">Always Included</div>
                           </div>
                         ) : (
