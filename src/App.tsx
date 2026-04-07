@@ -2567,7 +2567,23 @@ export default function App() {
     setEntries((prev) => ({ ...prev, [cardId]: Math.max(0, n) }));
   }
 
-  const pageLimit = Number.POSITIVE_INFINITY; // Path has no page cap; Grimoire cap is implicit outside builder
+  const pageLimit = 60;
+  const inkTarget = 75;
+
+  const inkTotal = useMemo(() => {
+    let total = 0;
+    for (const [id, qtyRaw] of Object.entries(entries || {})) {
+      const qty = qtyRaw || 0;
+      if (qty <= 0) continue;
+      const card = cardsById[id];
+      if (!card) continue;
+      if (card.type === 'Travel') continue; // Travel uses MP, not INK
+      const cost = Number(card.rank || 0);
+      if (!Number.isFinite(cost)) continue;
+      total += cost * qty;
+    }
+    return total;
+  }, [cardsById, entries]);
 
   const TYPE_LIMITS = useMemo(() => {
     // Path no longer enforces per-type caps; Astral/Shadow slots still follow their toggle caps elsewhere
@@ -3106,7 +3122,7 @@ export default function App() {
       return `Adjust aspect selections to ${maxNonSpecialNext} before changing modes.`;
     }
 
-    const pageLimitNext = 30;
+    const pageLimitNext = 60;
     if (totalQty > pageLimitNext && !overrideAll) {
       return `Reduce pages to ${pageLimitNext} before disabling this mode (currently ${totalQty}).`;
     }
@@ -3842,9 +3858,15 @@ export default function App() {
           <div className="space-y-4 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-auto lg:pr-1">
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold mb-2 text-center">Grimoire</h3>
+              <div className="flex items-center justify-center gap-6 text-sm font-medium mb-2">
+                <span>Pages: {totalQty}/{pageLimit}</span>
+                <span className={inkTotal === inkTarget ? undefined : 'text-red-600 font-semibold'}>
+                  INK: {inkTotal}/{inkTarget}
+                </span>
+              </div>
               <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
                 <span className="block">Focus is always available in the Grimoire and cannot be edited here.</span>
-                <span className="block">Grimoire uses a 30-page cap during play.</span>
+                <span className="block">Grimoire uses a 60-page cap during play.</span>
               </div>
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/40 p-3">
                 {focusCards.length > 0 ? (
@@ -3909,7 +3931,7 @@ export default function App() {
                 {(hasAstral || hasShadow) && (
                   <div className="mt-1 text-sm">{extraSummaryLine}</div>
                 )}
-                <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Copy limits apply. No page/type caps on the Path.</div>
+                <div className="mt-1 text-xs text-slate-600 dark:text-slate-300">Copy limits apply. Page cap: {pageLimit}.</div>
                 {darkArtsActive && (
                   <div className="mt-1 text-sm text-red-600 font-semibold">
                     Dark Arts active: All 3 Dark Arts are allowed, but [Holy] spells are blocked.
@@ -4053,7 +4075,7 @@ export default function App() {
               <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
                 <span className="block">All non-Focus spells live here. </span>
                 <span className="block">Study is always included.</span>
-                <span className="block">Add up to {darkArtsActive ? '3' : '2'} additional aspects (copy limits only; no page/type caps).</span>
+                <span className="block">Add up to {darkArtsActive ? '3' : '2'} additional aspects (copy limits; {pageLimit}-page cap).</span>
               </div>
               {(() => {
                 const expanded = Object.entries(entries)
@@ -4185,11 +4207,10 @@ export default function App() {
                     if (card.rank > maxRank) maxRank = card.rank;
                     if (card.rank > 2 && count > 1) fragmentsOk = false;
                   }
-                  const requiresMastery = pages > 30;
-                  return { items, pages, maxRank, fragmentsOk, requiresMastery };
+                  return { items, pages, maxRank, fragmentsOk };
                 } catch (e) {
                   console.warn('[Library.expandGrimoire] failed to parse prebound', g?.id, e);
-                  return { items: [], pages: 0, maxRank: 1, fragmentsOk: true, requiresMastery: false };
+                  return { items: [], pages: 0, maxRank: 1, fragmentsOk: true };
                 }
               }
 
@@ -4219,7 +4240,6 @@ export default function App() {
                     const aspectLabel = aspectList.map(s=>nameByAspect[s] || (s.replace(/_/g,' ')||s)).join(' + ');
                     const badges: React.ReactNode[] = [];
                     if (g.recommended) badges.push(<span key="rec" className="text-xs px-2 py-0.5 rounded-full bg-indigo-600 text-white">Recommended</span>);
-                    if (meta.requiresMastery) badges.push(<span key="mast" className="text-xs px-2 py-0.5 rounded-full bg-rose-600 text-white">Requires Mastery</span>);
                     if (fragmentsModeActive && meta.fragmentsOk) badges.push(<span key="frag" className="text-xs px-2 py-0.5 rounded-full bg-emerald-600 text-white">Fragments Compatible</span>);
                     return (
                       <div key={g.id} className={["rounded-xl border p-3 bg-white/80 dark:bg-slate-900/50", g.recommended? 'border-indigo-500 ring-1 ring-indigo-300 dark:ring-indigo-700':'border-slate-300 dark:border-slate-700'].join(' ')}>
