@@ -1900,6 +1900,7 @@ export default function App() {
     setCapAttempt(t);
     capTimer.current = window.setTimeout(() => setCapAttempt(null), 1500);
   };
+  const [spellSort, setSpellSort] = useState<'alpha' | 'ink' | 'copies'>('alpha');
   const [overrideAll, setOverrideAll] = useState(false);
   // Rank filter: show only cards with rank <= cap
   const [rankCap, setRankCap] = useState<number>(99);
@@ -3534,10 +3535,49 @@ export default function App() {
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold mb-2 text-center" style={{ fontSize: '26px' }}>Spell Pages</h3>
-            {/* Sort by role removed per request; keeping only role filter below */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+              <span className="text-sm text-slate-600 dark:text-slate-300">Sort:</span>
+              {([
+                { id: 'alpha', label: 'Alphabetical' },
+                { id: 'ink', label: 'INK Cost' },
+                { id: 'copies', label: '# of Copies' },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setSpellSort(opt.id)}
+                  className={[
+                    "px-3 py-1 rounded-md text-sm border shadow-sm",
+                    spellSort === opt.id
+                      ? "bg-indigo-100 text-indigo-800 border-indigo-300"
+                      : "bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700",
+                  ].join(' ')}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
             <div className="space-y-4">
               {groupedByAspect.map((group) => {
                 const collapsed = collapsedGroups[group.slug] ?? false;
+                const sortedCards = [...group.cards].sort((a, b) => {
+                  const typeBucket = (c: Card) => (c.type === 'Info' ? 0 : c.type === 'Travel' ? 1 : 2);
+                  const ta = typeBucket(a);
+                  const tb = typeBucket(b);
+                  if (ta !== tb) return ta - tb;
+                  if (spellSort === 'alpha') {
+                    return a.name.localeCompare(b.name);
+                  }
+                  if (spellSort === 'ink') {
+                    const diff = (a.rank || 0) - (b.rank || 0);
+                    if (diff !== 0) return diff;
+                    return a.name.localeCompare(b.name);
+                  }
+                  const qa = entries[a.id] || 0;
+                  const qb = entries[b.id] || 0;
+                  if (qb !== qa) return qb - qa;
+                  return a.name.localeCompare(b.name);
+                });
                 return (
                   <div key={group.slug} className="rounded-2xl bg-slate-50/60 dark:bg-slate-900/40 p-3">
                     <div className="flex items-center justify-between gap-3">
@@ -3663,7 +3703,7 @@ export default function App() {
                           })()}
                         </div>
                         <div className="divide-y px-3 md:px-5 lg:px-7 max-w-xl mx-auto rounded-2xl">
-                          {group.cards.map((card) => {
+                          {sortedCards.map((card) => {
                             const qty = entries[card.id] || 0;
                             const locked = !unlocksSet.has(card.aspect) && !isBasicAspect(card.aspect);
                             return (
