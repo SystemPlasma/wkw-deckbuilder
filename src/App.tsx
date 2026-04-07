@@ -3766,9 +3766,6 @@ export default function App() {
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold mb-3 text-center">Grimoire Contents</h3>
               <div className="text-xs text-center text-slate-600 dark:text-slate-300 mb-2">
-                <span className="block">All selected spells live here.</span>
-                <span className="block">Study is always included.</span>
-                <span className="block">Add up to {darkArtsActive ? '3' : '2'} additional aspects (copy limits only).</span>
               </div>
               {(() => {
                 const expanded = Object.entries(entries)
