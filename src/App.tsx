@@ -3740,14 +3740,39 @@ export default function App() {
                             {(['Holy', 'Light', 'Dark', 'Astral', 'Shadow'] as SpellType[]).map((t) => {
                               const list = otherCards.filter((c) => c.type === t).sort(compareBySort);
                               if (list.length === 0) return null;
+                              const isFocusLight = t === 'Light' && group.slug === FOCUS_SLUG;
+                              const cantrips = isFocusLight ? list.filter((c) => /cantrip/i.test(c.id)) : [];
+                              const nonCantrips = isFocusLight ? list.filter((c) => !/cantrip/i.test(c.id)) : list;
                               return (
                                 <details key={t} className="rounded-lg border border-slate-300 dark:border-slate-700" open>
                                   <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between bg-white dark:bg-slate-900 rounded-lg">
                                     <span className="font-semibold">[{t}]</span>
                                     <span className="text-sm text-slate-600 dark:text-slate-300">{list.length}</span>
                                   </summary>
-                                  <div className="p-2">
-                                    {renderCardRows(list)}
+                                  <div className="p-2 space-y-3">
+                                    {isFocusLight && cantrips.length > 0 && (
+                                      <div>
+                                        <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1">
+                                          Cantrips
+                                        </div>
+                                        {renderCardRows(cantrips)}
+                                      </div>
+                                    )}
+                                    {isFocusLight && cantrips.length > 0 && nonCantrips.length > 0 && (
+                                      <div className="border-t-2 border-slate-400 dark:border-slate-600 my-2" />
+                                    )}
+                                    {isFocusLight ? (
+                                      nonCantrips.length > 0 && (
+                                        <div>
+                                          <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-1">
+                                            Other Light
+                                          </div>
+                                          {renderCardRows(nonCantrips)}
+                                        </div>
+                                      )
+                                    ) : (
+                                      renderCardRows(list)
+                                    )}
                                   </div>
                                 </details>
                               );
