@@ -3136,7 +3136,7 @@ export default function App() {
           {/* Left (desktop): Rules · Library · Grimoires */}
           <div className="hidden sm:flex items-center gap-2 md:gap-3 justify-self-start pl-2 sm:pl-4 mt-1 md:mt-3 w-auto">
             <a
-              href="https://docs.google.com/document/d/1_Vso3yHHDZo5LrzWOoWWuSx_P4fiZrx-oQWdGBXncEs/edit?usp=sharing"
+              href="https://docs.google.com/document/d/1agGCZ8xGFOgdjgNTtTw364g_ZmnWj07iFQQuplgwp-c/edit?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-xl border-2 px-4 py-2 text-base md:text-xl bg-slate-100 text-slate-900 hover:bg-slate-200 shadow-md font-semibold border-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:border-slate-600"
@@ -3185,7 +3185,7 @@ export default function App() {
           <div className="sm:hidden col-span-1 w-full flex flex-col items-center gap-2 mt-1">
             <div className="flex flex-wrap items-center justify-center gap-2 w-full">
               <a
-                href="https://docs.google.com/document/d/1_Vso3yHHDZo5LrzWOoWWuSx_P4fiZrx-oQWdGBXncEs/edit?usp=sharing"
+                href="https://docs.google.com/document/d/1agGCZ8xGFOgdjgNTtTw364g_ZmnWj07iFQQuplgwp-c/edit?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl border-2 px-4 py-2 text-base bg-slate-100 text-slate-900 hover:bg-slate-200 shadow-md font-semibold border-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:border-slate-600"
