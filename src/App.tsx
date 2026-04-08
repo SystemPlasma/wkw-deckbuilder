@@ -3146,8 +3146,9 @@ export default function App() {
             <button
               type="button"
               aria-label="Library"
-              onClick={() => setShowLibrary(true)}
-              className="rounded-xl border-2 px-4 py-2 text-base md:text-xl bg-slate-100 text-slate-900 hover:bg-slate-200 shadow-md font-semibold border-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:border-slate-600"
+              onClick={() => {}}
+              disabled
+              className="hidden rounded-xl border-2 px-4 py-2 text-base md:text-xl bg-slate-100 text-slate-900 shadow-md font-semibold border-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600"
             >
               Library
             </button>
