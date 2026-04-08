@@ -4046,7 +4046,6 @@ export default function App() {
                         {g.description && (
                           <div className="text-sm text-slate-700 dark:text-slate-200 mt-1">{g.description}</div>
                         )}
-                        <div className="text-xs text-slate-600 dark:text-slate-300 mt-1">Ranks {minR}–{maxR}</div>
                         <div className="mt-2 flex flex-wrap gap-1">
                           {aspectList.map(s => (
                             <span key={s} className={`text-[10px] px-2 py-0.5 rounded-full ${chipClassForAspect(s)}`}>{nameByAspect[s]|| (s.replace(/_/g,' ')||s)}</span>
