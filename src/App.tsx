@@ -3799,7 +3799,7 @@ export default function App() {
                               );
                             })}
                             {pinnedCards.length > 0 && otherCards.length > 0 && (
-                              <div className="border-t-2 border-slate-400 dark:border-slate-600 my-2" />
+                              <div className="border-t-4 border-slate-400 dark:border-slate-600 my-3" />
                             )}
                             {otherCards.map((card) => {
                               const qty = entries[card.id] || 0;
