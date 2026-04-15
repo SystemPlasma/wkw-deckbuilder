@@ -36,42 +36,42 @@
     "mime": "image/png"
   },
   "F_Cantrip_Scribbles": {
-    "file": "7fd194206b6a4dfc42224fee5e95de4e.bin",
+    "file": "00b7d4bada0baf2528dcc86a9275e8e3.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Draft": {
-    "file": "2935b4551fcd8f6c32c614ad1c446a55.bin",
+    "file": "b2de4eb55a3f899cd9e56e96708ddc32.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Revise": {
-    "file": "f1074b16f50258b74b50e24a979a5595.bin",
+    "file": "79c0e7d474d7697b2d6e9b34939e0fa6.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Smudge": {
-    "file": "15d45d25d89b10e22daf59d4a1e23c40.bin",
+    "file": "d85fb8d602d56f8fac9248d566643bbc.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Margin_Note": {
-    "file": "aa12d9d0c55debb571ed765b6e5ea0b4.bin",
+    "file": "0e5fd293012ced9038c21469a97393b1.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Annotation": {
-    "file": "6276537b43cb5db3d1f1e1a2882d137f.bin",
+    "file": "e6bff3f7f13f3bf4fb4991b9348b8cd4.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Blot": {
-    "file": "b7a73de0e77b562fd4596f2cd1418b56.bin",
+    "file": "421e13ffc751f3fd280f431e0d3a8967.bin",
     "mime": "image/png"
   },
   "F_Cantrip_Seek": {
-    "file": "4878e4eea00f79b93456cc2157a4aeac.bin",
+    "file": "c9db3ab7bf8ee5c850f3c0bc63f0fd73.bin",
     "mime": "image/png"
   },
   "F_Dread": {
     "file": "e4681aafa6c686a0ff1e807453866cf5.bin",
     "mime": "image/png"
   },
-  "S_Travel_Surge": {
+  "S_TRAVEL_Surge": {
     "file": "f27367d527e03bd46538ef473cad96fc.bin",
     "mime": "image/png"
   },
@@ -315,6 +315,10 @@
     "file": "9a5d6b215434fcb8de7e180a4dd1421f.bin",
     "mime": "image/png"
   },
+  "B_Dissolve": {
+    "file": "5972b0b160e9625225491a4388ddec84.bin",
+    "mime": "image/png"
+  },
   "BT_INFO": {
     "file": "ecada09351315469908af1ccd4f28281.bin",
     "mime": "image/png"
@@ -381,6 +385,82 @@
   },
   "CURSE_Drain": {
     "file": "aa0e879385fb745c7d9b9bf968f2c3d8.bin",
+    "mime": "image/png"
+  },
+  "DA_Pain_TRAVEL_Wounded_Retreat": {
+    "file": "09e33f3c69426978cd3f6da6e9fc2077.bin",
+    "mime": "image/png"
+  },
+  "DA_Pain_Bloodletting": {
+    "file": "d89cff43936f0d885b6c13d53fb67a4c.bin",
+    "mime": "image/png"
+  },
+  "DA_Pain_Strain": {
+    "file": "80ce0e1493f601807bcd2ceadf120999.bin",
+    "mime": "image/png"
+  },
+  "DA_Pain_Bloody_Future": {
+    "file": "fbd82cd49d9176935f62a50efd2bfe00.bin",
+    "mime": "image/png"
+  },
+  "DA_Pain_Gaze_into_Darkness": {
+    "file": "c2ea9177b4dc161372b358002eba23ea.bin",
+    "mime": "image/png"
+  },
+  "DA_Pain_Rupture": {
+    "file": "5901d8696fffd9569ac32feb73e731e2.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_TRAVEL_Frantic_Flight": {
+    "file": "99f772d089726d58eb9f9c102422275d.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_Rush": {
+    "file": "8e261210f03e85047c432a58ee65642d.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_Aftershock": {
+    "file": "7e15e3d70120e8206f84ec7caeb26b81.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_Distortion": {
+    "file": "1144e01958b25e58d863092dea50fe29.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_Flicker": {
+    "file": "0978870e33a430e83ebc736c4b31f3ec.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_Overreach": {
+    "file": "d8cb9d076e0dbba9bbfadf9da316099b.bin",
+    "mime": "image/png"
+  },
+  "DA_Panic_Fear": {
+    "file": "2d4f796df389df134689f8f404b5c793.bin",
+    "mime": "image/png"
+  },
+  "DA_Terror_TRAVEL_Last_Resort": {
+    "file": "6c55a73dc3451fbe967510a659fd8498.bin",
+    "mime": "image/png"
+  },
+  "DA_Terror_Doom_Harvest": {
+    "file": "75ababced5a652f5094ac57be5b5684d.bin",
+    "mime": "image/png"
+  },
+  "DA_Terror_Execution": {
+    "file": "db5b6fe7505680778e2d58f188cb12d4.bin",
+    "mime": "image/png"
+  },
+  "DA_Terror_Grave_Exchange": {
+    "file": "fccf64951c2711bc3298c6dbe9cf6d09.bin",
+    "mime": "image/png"
+  },
+  "DA_Terror_Burden": {
+    "file": "e9b4bdcfdeb5dbcdb1b6a97fb237fc63.bin",
+    "mime": "image/png"
+  },
+  "DA_Terror_Infernal_Seal": {
+    "file": "1a8244f99b4014274c3bb32c5a6ecba7.bin",
     "mime": "image/png"
   }
 }
